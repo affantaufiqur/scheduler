@@ -10,7 +10,7 @@ const DATABASE = process.env.DATABASE_NAME || "postgres";
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "./src/db/schema/",
+  schema: "./src/configs/db/schema/",
   dialect: "postgresql",
   dbCredentials: {
     url: URL,

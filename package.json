@@ -9,7 +9,7 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "db:generate": "npx drizzle-kit generate",
-    "db:migrate": "npx dlx drizzle-kit migrate"
+    "db:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",

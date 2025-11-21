@@ -1,10 +1,15 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { createRootRouteWithContext } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import appCss from "../styles.css?url";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       {
@@ -48,6 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
           ]}
         />
+        <ReactQueryDevtools initialIsOpen={false} position="top" buttonPosition="top-right" />
         <Scripts />
       </body>
     </html>

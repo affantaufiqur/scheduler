@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm";
 import * as argon2 from "argon2";
 import createSessionToken from "@/helpers/session-token";
 
-import { registerSchema } from "@/routes/(auth)/register";
-import { loginSchema } from "@/routes/(auth)/login";
+import { registerSchema } from "@/functions/auth/register";
+import { loginSchema } from "@/functions/auth/login";
 
 import z from "zod";
 

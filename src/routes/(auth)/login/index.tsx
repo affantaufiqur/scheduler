@@ -1,37 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { z } from "zod";
-import { createServerFn } from "@tanstack/react-start";
-import { setCookie } from "@tanstack/react-start/server";
 import { Eye, EyeClosed, Loader } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/Input";
 import { mapZodErrors, type FieldErrors } from "@/helpers/zodError";
-import { loginUser } from "@/service/user";
+import { login, loginSchema } from "@/functions";
 import { useNavigate } from "@tanstack/react-router";
-
-export const loginSchema = z.object({
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-export const login = createServerFn({ method: "POST" })
-  .inputValidator(loginSchema)
-  .handler(async ({ data }) => {
-    const user = await loginUser(data);
-    if (user.error) {
-      return { error: "Invalid email or password" };
-    }
-
-    const token = user.token!;
-    setCookie("token", token, {
-      httpOnly: true,
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
-
-    return { error: null };
-  });
 
 export const Route = createFileRoute("/(auth)/login/")({
   component: RouteComponent,
@@ -39,6 +13,7 @@ export const Route = createFileRoute("/(auth)/login/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const loginFn = useServerFn(login);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -83,7 +58,7 @@ function RouteComponent() {
           isLoading: true,
         }));
 
-        const req = await login({
+        const req = await loginFn({
           data: {
             email: result.data.email,
             password: result.data.password,

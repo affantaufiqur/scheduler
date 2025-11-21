@@ -1,37 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { z } from "zod";
-import { createServerFn } from "@tanstack/react-start";
-import { setCookie } from "@tanstack/react-start/server";
 import { Eye, EyeClosed } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/Input";
 import { mapZodErrors, type FieldErrors } from "@/helpers/zodError";
-import { createUser } from "@/service/user";
+import { register, registerSchema } from "@/functions";
 import { useNavigate } from "@tanstack/react-router";
-
-export const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-export const register = createServerFn({ method: "POST" })
-  .inputValidator(registerSchema)
-  .handler(async ({ data }) => {
-    const register = await createUser(data);
-    if (register.error) {
-      return false;
-    }
-
-    const token = register.token;
-
-    setCookie("token", token!, {
-      path: "/",
-      secure: false,
-    });
-
-    return true;
-  });
 
 export const Route = createFileRoute("/(auth)/register/")({
   component: RouteComponent,
@@ -39,6 +13,8 @@ export const Route = createFileRoute("/(auth)/register/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const registerFn = useServerFn(register);
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -80,7 +56,7 @@ function RouteComponent() {
       }
 
       setFieldErrors({});
-      const req = await register({
+      const req = await registerFn({
         data: {
           username: result.data.username,
           email: result.data.email,

@@ -13,7 +13,6 @@ interface GeneralSettingsProps {
 export function GeneralSettings({ settings }: GeneralSettingsProps) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
 
   const [formData, setFormData] = useState<OrganizerSettingsData>({
     defaultMeetingDuration: settings?.defaultMeetingDuration || 30,
@@ -30,9 +29,8 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
       queryClient.invalidateQueries({ queryKey: ["organizer-settings"] });
       toast.success("Settings updated successfully!");
     },
-    onError: (error) => {
-      console.error("Failed to update settings:", error);
-      // Handle error display
+    onError: () => {
+      toast.error("Failed to update settings");
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -55,10 +53,6 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-6 text-2xl font-bold text-gray-900">General Settings</h1>
-
-      {successMessage && (
-        <div className="mb-4 rounded-md bg-green-100 p-3 text-green-700">{successMessage}</div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Input.Root>

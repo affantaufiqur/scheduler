@@ -2,6 +2,7 @@ import db from "@/configs/db";
 import redis from "@/configs/db/redis";
 import { userTable } from "@/configs/db/schema/users";
 import { organizerSettingsTable } from "@/configs/db/schema/organizer-settings";
+import { workingHoursTable } from "@/configs/db/schema/working-hours";
 import { eq } from "drizzle-orm";
 import * as argon2 from "argon2";
 import createSessionToken from "@/helpers/session-token";
@@ -72,7 +73,37 @@ export async function createUser(user: z.infer<typeof registerSchema>) {
         throw new Error("Failed to create organizer settings");
       }
 
-      return { userId, settingsId: settingsResult[0].id };
+      // 3. Create default working hours
+      const defaultWorkingHours = [
+        { dayOfWeek: "1", startTime: "09:00", endTime: "17:00", isActive: true }, // Monday
+        { dayOfWeek: "2", startTime: "09:00", endTime: "17:00", isActive: true }, // Tuesday
+        { dayOfWeek: "3", startTime: "09:00", endTime: "17:00", isActive: true }, // Wednesday
+        { dayOfWeek: "4", startTime: "09:00", endTime: "17:00", isActive: true }, // Thursday
+        { dayOfWeek: "5", startTime: "09:00", endTime: "17:00", isActive: true }, // Friday
+      ];
+
+      const workingHoursResults = await Promise.all(
+        defaultWorkingHours.map((hours) =>
+          tx
+            .insert(workingHoursTable)
+            .values({
+              userId,
+              dayOfWeek: hours.dayOfWeek,
+              startTime: hours.startTime,
+              endTime: hours.endTime,
+              isActive: hours.isActive,
+            })
+            .returning({ id: workingHoursTable.id }),
+        ),
+      );
+
+      // Verify all working hours were created
+      if (workingHoursResults.some((result) => !result || result.length === 0)) {
+        tx.rollback();
+        throw new Error("Failed to create default working hours");
+      }
+
+      return { userId, settingsId: settingsResult[0].id, workingHoursCreated: true };
     });
 
     // 3. Create Redis session (outside DB transaction)

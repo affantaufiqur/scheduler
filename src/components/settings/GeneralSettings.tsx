@@ -4,6 +4,7 @@ import { getTimeZoneValues } from "@/helpers/list-timezone";
 import { useState } from "react";
 import { OrganizerSettingsData } from "@/functions/organizer-settings";
 import { Input } from "@/components/Input";
+import { toast } from "sonner";
 
 interface GeneralSettingsProps {
   settings: OrganizerSettingsData;
@@ -27,8 +28,7 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
     mutationFn: (data: OrganizerSettingsData) => updateOrganizerSettings({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizer-settings"] });
-      setSuccessMessage("Settings updated successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000);
+      toast.success("Settings updated successfully!");
     },
     onError: (error) => {
       console.error("Failed to update settings:", error);
@@ -78,9 +78,7 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <Input.Root>
-            <Input.Label htmlFor="preBookingBuffer">
-              Pre-booking Buffer (minutes)
-            </Input.Label>
+            <Input.Label htmlFor="preBookingBuffer">Pre-booking Buffer (minutes)</Input.Label>
             <Input.Field
               type="number"
               id="preBookingBuffer"
@@ -93,9 +91,7 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
           </Input.Root>
 
           <Input.Root>
-            <Input.Label htmlFor="postBookingBuffer">
-              Post-booking Buffer (minutes)
-            </Input.Label>
+            <Input.Label htmlFor="postBookingBuffer">Post-booking Buffer (minutes)</Input.Label>
             <Input.Field
               type="number"
               id="postBookingBuffer"
@@ -110,9 +106,7 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <Input.Root>
-            <Input.Label htmlFor="minBookingNotice">
-              Minimum Booking Notice (hours)
-            </Input.Label>
+            <Input.Label htmlFor="minBookingNotice">Minimum Booking Notice (hours)</Input.Label>
             <Input.Field
               type="number"
               id="minBookingNotice"
@@ -121,15 +115,11 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
               value={formData.minBookingNotice}
               onChange={(e) => handleInputChange("minBookingNotice", e.target.value)}
             />
-            <Input.Hint>
-              How far in advance users must book (0-168 hours)
-            </Input.Hint>
+            <Input.Hint>How far in advance users must book (0-168 hours)</Input.Hint>
           </Input.Root>
 
           <Input.Root>
-            <Input.Label htmlFor="maxBookingAdvance">
-              Maximum Booking Advance (days)
-            </Input.Label>
+            <Input.Label htmlFor="maxBookingAdvance">Maximum Booking Advance (days)</Input.Label>
             <Input.Field
               type="number"
               id="maxBookingAdvance"
@@ -138,9 +128,7 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
               value={formData.maxBookingAdvance}
               onChange={(e) => handleInputChange("maxBookingAdvance", e.target.value)}
             />
-            <Input.Hint>
-              How far in the future users can book (1-365 days)
-            </Input.Hint>
+            <Input.Hint>How far in the future users can book (1-365 days)</Input.Hint>
           </Input.Root>
         </div>
 

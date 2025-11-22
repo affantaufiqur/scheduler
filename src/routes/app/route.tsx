@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/middleware/auth";
+import Header from "@/components/Header";
 
 const server = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -18,5 +19,10 @@ export const Route = createFileRoute("/app")({
 
 function RouteComponent() {
   const { user } = Route.useRouteContext();
-  return <div>Hello {user.username}</div>;
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Header username={user.username} />
+      <Outlet />
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 import db from "@/configs/db";
 import redis from "@/configs/db/redis";
 import { userTable } from "@/configs/db/schema/users";
+import { organizerSettingsTable } from "@/configs/db/schema/organizer-settings";
 import { eq } from "drizzle-orm";
 import * as argon2 from "argon2";
 import createSessionToken from "@/helpers/session-token";
@@ -28,32 +29,63 @@ export async function userExists(email: string) {
 
 export async function createUser(user: z.infer<typeof registerSchema>) {
   const hashedPassword = await argon2.hash(user.password);
-  const tx = await db.transaction((tx) => {
-    return tx
-      .insert(userTable)
-      .values({
-        username: user.username,
-        email: user.email,
-        password: hashedPassword,
-      })
-      .returning({
-        id: userTable.id,
-      });
-  });
 
-  if (!tx || tx.length === 0) {
-    return { error: "Failed to create user" };
+  try {
+    const result = await db.transaction(async (tx) => {
+      // 1. Create user
+      const userResult = await tx
+        .insert(userTable)
+        .values({
+          username: user.username,
+          email: user.email,
+          password: hashedPassword,
+        })
+        .returning({
+          id: userTable.id,
+        });
+
+      if (!userResult || userResult.length === 0) {
+        tx.rollback();
+        throw new Error("Failed to create user");
+      }
+
+      const userId = userResult[0].id;
+
+      // 2. Create organizer settings in same transaction
+      const settingsResult = await tx
+        .insert(organizerSettingsTable)
+        .values({
+          userId,
+          defaultMeetingDuration: 30, // in minutes
+          preBookingBuffer: 0, // in minutes
+          postBookingBuffer: 0, // in minutes
+          minBookingNotice: 2, // in hours
+          maxBookingAdvance: 14, // in days
+          workingTimezone: "UTC",
+        })
+        .returning({
+          id: organizerSettingsTable.id,
+        });
+
+      if (!settingsResult || settingsResult.length === 0) {
+        tx.rollback();
+        throw new Error("Failed to create organizer settings");
+      }
+
+      return { userId, settingsId: settingsResult[0].id };
+    });
+
+    // 3. Create Redis session (outside DB transaction)
+    const token = createSessionToken();
+    const redisKey = `${SESSION_PREFIX}:${token}`;
+    await redis.set(redisKey, result.userId, {
+      EX: SESSION_EXPIRY,
+    });
+
+    return { token };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to create user" };
   }
-
-  const userId = tx[0].id;
-
-  const token = createSessionToken();
-  const redisKey = `${SESSION_PREFIX}:${token}`;
-  await redis.set(redisKey, userId, {
-    EX: SESSION_EXPIRY,
-  });
-
-  return { token };
 }
 
 export async function getUserById(userId: string) {

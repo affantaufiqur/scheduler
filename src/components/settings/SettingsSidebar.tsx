@@ -1,4 +1,4 @@
-type SettingsSection = "general" | "working-hours";
+type SettingsSection = "general" | "working-hours" | "blackout-dates";
 
 interface SettingsSidebarProps {
   activeSection: SettingsSection;
@@ -9,6 +9,7 @@ export function SettingsSidebar({ activeSection, setActiveSection }: SettingsSid
   const menuItems = [
     { id: "general", label: "General Settings" },
     { id: "working-hours", label: "Working Hours" },
+    { id: "blackout-dates", label: "Blackout Dates" },
   ] as const;
 
   return (

@@ -5,12 +5,13 @@ import { SettingsSidebar } from "@/components/settings/SettingsSidebar";
 import { GeneralSettings } from "@/components/settings/GeneralSettings";
 import { WorkingHours } from "@/components/settings/WorkingHours";
 import { useQuery } from "@tanstack/react-query";
+import { BlackoutDates } from "@/components/settings/BlackoutDates";
 
 export const Route = createFileRoute("/app/settings/")({
   component: RouteComponent,
 });
 
-type SettingsSection = "general" | "working-hours";
+type SettingsSection = "general" | "working-hours" | "blackout-dates";
 
 function RouteComponent() {
   const [activeSection, setActiveSection] = useState<SettingsSection>("general");
@@ -42,6 +43,8 @@ function RouteComponent() {
         return <GeneralSettings settings={settings} />;
       case "working-hours":
         return <WorkingHours />;
+      case "blackout-dates":
+        return <BlackoutDates />;
       default:
         return <GeneralSettings settings={settings} />;
     }

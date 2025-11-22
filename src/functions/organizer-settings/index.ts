@@ -8,6 +8,14 @@ export {
   bulkUpdateWorkingHoursFn,
   setDefaultWorkingHoursFn
 } from "./working-hours";
+export {
+  getBlackoutDates,
+  getBlackoutDatesInRange,
+  createBlackoutDateFn,
+  updateBlackoutDateFn,
+  deleteBlackoutDateFn,
+  bulkUpsertBlackoutDatesFn
+} from "./blackout-days";
 export { 
   organizerSettingsSchema,
   workingHoursSchema,

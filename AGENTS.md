@@ -249,6 +249,7 @@ export const getPost = createServerFn()
 ## 4. Architecture: The Service Pattern
 
 Do not put business logic inside UI components or Server Function definitions.
+Do not create any migration files
 
 1.  **The View (UI):** `src/routes/*`. Dumb components. Calls Server Functions.
 2.  **The API (Transport):** `src/functions/*`. TanStack Server Functions. Validates Zod schemas, checks Auth, calls Service.

@@ -28,6 +28,14 @@ function RouteComponent() {
     );
   }
 
+  if (!settings) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-lg text-red-600">Failed to load settings.</div>
+      </div>
+    );
+  }
+
   const renderActiveSection = () => {
     switch (activeSection) {
       case "general":

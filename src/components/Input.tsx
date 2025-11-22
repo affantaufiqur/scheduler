@@ -33,10 +33,10 @@ const Field = forwardRef<HTMLInputElement, InputFieldProps>(
       <div className={`relative ${wrapperClassName}`.trim()}>
         <input
           ref={ref}
-          className={`w-full rounded-sm border px-4 py-2 transition-colors focus:outline-none ${
+          className={`w-full rounded-md border border-gray-300 px-4 py-1 shadow-sm focus:outline-none ${
             hasError
-              ? "border-red-500 bg-white text-black focus:border-red-600"
-              : "border-gray-400 bg-white text-black focus:border-black"
+              ? "border-red-500 bg-white text-black focus:border-red-600 focus:ring-red-600"
+              : "bg-white text-black focus:border-blue-500 focus:ring-blue-500"
           } ${hasAdornment ? "pr-12" : ""} ${className}`.trim()}
           {...props}
         />

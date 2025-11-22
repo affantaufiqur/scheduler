@@ -3,6 +3,7 @@ import { updateOrganizerSettings } from "@/functions/organizer-settings";
 import { getTimeZoneValues } from "@/helpers/list-timezone";
 import { useState } from "react";
 import { OrganizerSettingsData } from "@/functions/organizer-settings";
+import { Input } from "@/components/Input";
 
 interface GeneralSettingsProps {
   settings: OrganizerSettingsData;
@@ -60,113 +61,91 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label
-            htmlFor="defaultMeetingDuration"
-            className="mb-1 block text-sm font-medium text-gray-700"
-          >
+        <Input.Root>
+          <Input.Label htmlFor="defaultMeetingDuration">
             Default Meeting Duration (minutes)
-          </label>
-          <input
+          </Input.Label>
+          <Input.Field
             type="number"
             id="defaultMeetingDuration"
             min="15"
             max="240"
             value={formData.defaultMeetingDuration}
             onChange={(e) => handleInputChange("defaultMeetingDuration", e.target.value)}
-            className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
-          <p className="mt-1 text-xs text-gray-500">Duration for new meetings (15-240 minutes)</p>
-        </div>
+          <Input.Hint>Duration for new meetings (15-240 minutes)</Input.Hint>
+        </Input.Root>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="preBookingBuffer"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
+          <Input.Root>
+            <Input.Label htmlFor="preBookingBuffer">
               Pre-booking Buffer (minutes)
-            </label>
-            <input
+            </Input.Label>
+            <Input.Field
               type="number"
               id="preBookingBuffer"
               min="0"
               max="120"
               value={formData.preBookingBuffer}
               onChange={(e) => handleInputChange("preBookingBuffer", e.target.value)}
-              className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
-            <p className="mt-1 text-xs text-gray-500">Time to block before meetings</p>
-          </div>
+            <Input.Hint>Time to block before meetings</Input.Hint>
+          </Input.Root>
 
-          <div>
-            <label
-              htmlFor="postBookingBuffer"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
+          <Input.Root>
+            <Input.Label htmlFor="postBookingBuffer">
               Post-booking Buffer (minutes)
-            </label>
-            <input
+            </Input.Label>
+            <Input.Field
               type="number"
               id="postBookingBuffer"
               min="0"
               max="120"
               value={formData.postBookingBuffer}
               onChange={(e) => handleInputChange("postBookingBuffer", e.target.value)}
-              className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
-            <p className="mt-1 text-xs text-gray-500">Time to block after meetings</p>
-          </div>
+            <Input.Hint>Time to block after meetings</Input.Hint>
+          </Input.Root>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="minBookingNotice"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
+          <Input.Root>
+            <Input.Label htmlFor="minBookingNotice">
               Minimum Booking Notice (hours)
-            </label>
-            <input
+            </Input.Label>
+            <Input.Field
               type="number"
               id="minBookingNotice"
               min="0"
               max="168"
               value={formData.minBookingNotice}
               onChange={(e) => handleInputChange("minBookingNotice", e.target.value)}
-              className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <Input.Hint>
               How far in advance users must book (0-168 hours)
-            </p>
-          </div>
+            </Input.Hint>
+          </Input.Root>
 
-          <div>
-            <label
-              htmlFor="maxBookingAdvance"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
+          <Input.Root>
+            <Input.Label htmlFor="maxBookingAdvance">
               Maximum Booking Advance (days)
-            </label>
-            <input
+            </Input.Label>
+            <Input.Field
               type="number"
               id="maxBookingAdvance"
               min="1"
               max="365"
               value={formData.maxBookingAdvance}
               onChange={(e) => handleInputChange("maxBookingAdvance", e.target.value)}
-              className="block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <Input.Hint>
               How far in the future users can book (1-365 days)
-            </p>
-          </div>
+            </Input.Hint>
+          </Input.Root>
         </div>
 
-        <div>
-          <label htmlFor="workingTimezone" className="mb-1 block text-sm font-medium text-gray-700">
-            Working Timezone
-          </label>
+        <Input.Root>
+          <Input.Label htmlFor="workingTimezone">Working Timezone</Input.Label>
           <select
             id="workingTimezone"
             value={formData.workingTimezone}
@@ -179,8 +158,8 @@ export function GeneralSettings({ settings }: GeneralSettingsProps) {
               </option>
             ))}
           </select>
-          <p className="mt-1 text-xs text-gray-500">Your working timezone for scheduling</p>
-        </div>
+          <Input.Hint>Your working timezone for scheduling</Input.Hint>
+        </Input.Root>
 
         <div className="pt-4">
           <button

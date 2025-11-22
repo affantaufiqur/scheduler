@@ -24,16 +24,14 @@ export default function Header({ username }: HeaderProps) {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-8">
             {routes.map((route) => (
-              <>
-                <Link
-                  viewTransition={true}
-                  key={route.id}
-                  to={route.href}
-                  className={`rounded-md py-2 text-sm font-medium`}
-                >
-                  {route.name}
-                </Link>
-              </>
+              <Link
+                viewTransition={true}
+                key={route.id}
+                to={route.href}
+                className={`rounded-md py-2 text-sm font-medium`}
+              >
+                {route.name}
+              </Link>
             ))}
           </div>
           <div className="flex items-center">

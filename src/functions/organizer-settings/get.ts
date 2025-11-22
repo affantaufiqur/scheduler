@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/middleware/auth";
 import { getOrganizerSettings as getOrganizerSettingsService } from "@/service/organizer-settings";
+import { TimeZoneValue } from "@/helpers/list-timezone";
 
 export const getOrganizerSettings = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -22,5 +23,6 @@ export const getOrganizerSettings = createServerFn({ method: "GET" })
       maxBookingAdvance: settings.maxBookingAdvance,
       createdAt: settings.createdAt,
       updatedAt: settings.updatedAt,
+      workingTimezone: settings.workingTimezone as TimeZoneValue,
     };
   });

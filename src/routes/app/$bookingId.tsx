@@ -58,8 +58,7 @@ function RouteComponent() {
   };
 
   const handleReschedule = () => {
-    // Placeholder for now - doesn't do anything as requested
-    console.log("Reschedule button clicked");
+    navigate({ to: `/app/${bookingId}/reschedule` });
   };
 
   if (isLoading) {

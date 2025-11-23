@@ -13,10 +13,11 @@ import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as UsernameRouteRouteImport } from './routes/$username/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as AppBookingIdRouteImport } from './routes/app/$bookingId'
+import { Route as AppBookingIdRouteImport } from '../routes/app/$bookingId/reschedule.tsx
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as authRegisterIndexRouteImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './routes/(auth)/login/index'
+import { Route as AppBookingIdRescheduleRouteImport } from './routes/app/$bookingId_.reschedule.tsx'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
@@ -58,13 +59,19 @@ const authLoginIndexRoute = authLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppBookingIdRescheduleRoute = AppBookingIdRescheduleRouteImport.update({
+  id: '/reschedule',
+  path: '/reschedule',
+  getParentRoute: () => AppBookingIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
-  '/app/$bookingId': typeof AppBookingIdRoute
+  '/app/$bookingId': typeof AppBookingIdRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/$bookingId/reschedule': typeof AppBookingIdRescheduleRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
@@ -72,8 +79,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
-  '/app/$bookingId': typeof AppBookingIdRoute
+  '/app/$bookingId': typeof AppBookingIdRouteWithChildren
   '/app': typeof AppIndexRoute
+  '/app/$bookingId/reschedule': typeof AppBookingIdRescheduleRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
   '/app/settings': typeof AppSettingsIndexRoute
@@ -83,8 +91,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
-  '/app/$bookingId': typeof AppBookingIdRoute
+  '/app/$bookingId': typeof AppBookingIdRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/$bookingId/reschedule': typeof AppBookingIdRescheduleRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
   '/app/settings/': typeof AppSettingsIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/$bookingId'
     | '/app/'
+    | '/app/$bookingId/reschedule'
     | '/login'
     | '/register'
     | '/app/settings'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/$username'
     | '/app/$bookingId'
     | '/app'
+    | '/app/$bookingId/reschedule'
     | '/login'
     | '/register'
     | '/app/settings'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/$bookingId'
     | '/app/'
+    | '/app/$bookingId/reschedule'
     | '/(auth)/login/'
     | '/(auth)/register/'
     | '/app/settings/'
@@ -187,17 +199,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/$bookingId/reschedule': {
+      id: '/app/$bookingId/reschedule'
+      path: '/reschedule'
+      fullPath: '/app/$bookingId/reschedule'
+      preLoaderRoute: typeof AppBookingIdRescheduleRouteImport
+      parentRoute: typeof AppBookingIdRoute
+    }
   }
 }
 
+interface AppBookingIdRouteChildren {
+  AppBookingIdRescheduleRoute: typeof AppBookingIdRescheduleRoute
+}
+
+const AppBookingIdRouteChildren: AppBookingIdRouteChildren = {
+  AppBookingIdRescheduleRoute: AppBookingIdRescheduleRoute,
+}
+
+const AppBookingIdRouteWithChildren = AppBookingIdRoute._addFileChildren(
+  AppBookingIdRouteChildren,
+)
+
 interface AppRouteRouteChildren {
-  AppBookingIdRoute: typeof AppBookingIdRoute
+  AppBookingIdRoute: typeof AppBookingIdRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppBookingIdRoute: AppBookingIdRoute,
+  AppBookingIdRoute: AppBookingIdRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
 }

@@ -25,17 +25,14 @@ export function AvailabilitySlots({
   selectedSlot,
 }: AvailabilitySlotsProps) {
   // Group slots by date for better organization
-  const slotsByDate = slots.reduce(
-    (acc: Record<string, Slot[]>, slot) => {
-      const date = DateTime.fromISO(slot.startTime).toFormat("yyyy-MM-dd");
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(slot);
-      return acc;
-    },
-    {},
-  );
+  const slotsByDate = slots.reduce((acc: Record<string, Slot[]>, slot) => {
+    const date = DateTime.fromISO(slot.startTime).toFormat("yyyy-MM-dd");
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(slot);
+    return acc;
+  }, {});
 
   // Sort dates
   const sortedDates = Object.keys(slotsByDate).sort();
@@ -94,17 +91,16 @@ export function AvailabilitySlots({
                   >
                     <div className="text-center">
                       <div className="text-lg font-medium text-gray-900">
-                        {attendeeStartTime.toFormat("h:mm a")}
+                        {attendeeStartTime.toFormat("HH:mm")}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {attendeeEndTime.toFormat("h:mm a")}
+                        {attendeeEndTime.toFormat("HH:mm")}
                       </div>
                       <div className="mt-1 text-xs text-gray-500">{slot.duration} minutes</div>
                       {attendeeTimezone !== slot.timezone && (
                         <div className="mt-2 border-t pt-2">
                           <div className="text-xs text-gray-400">
-                            Organizer: {startTime.toFormat("h:mm a")} -{" "}
-                            {endTime.toFormat("h:mm a")}
+                            Organizer: {startTime.toFormat("HH:mm")} - {endTime.toFormat("HH:mm")}
                           </div>
                           <div className="text-xs text-gray-400">({slot.timezone})</div>
                         </div>

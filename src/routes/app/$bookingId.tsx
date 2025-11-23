@@ -169,15 +169,17 @@ function RouteComponent() {
                 </div>
 
                 {/* Additional attendees if metadata exists */}
-                {booking.metadata && booking.metadata.additionalAttendees && (
+                {booking.metadata && booking.metadata.additional_attendees && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700">Additional Attendees</h3>
+                    <h3 className="text-sm font-medium text-gray-700">
+                      Additional Attendees ({booking.metadata.additional_attendees.length})
+                    </h3>
                     <ul className="mt-1 text-sm text-gray-900">
-                      {booking.metadata.additionalAttendees.map((attendee: any, index: number) => (
-                        <li key={index}>
-                          {attendee.name} ({attendee.email})
-                        </li>
-                      ))}
+                      {booking.metadata.additional_attendees.map(
+                        (attendee: string, index: number) => (
+                          <li key={index}>{attendee}</li>
+                        ),
+                      )}
                     </ul>
                   </div>
                 )}

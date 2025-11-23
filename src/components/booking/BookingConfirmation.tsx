@@ -94,7 +94,7 @@ export function BookingConfirmation({
       </div>
 
       {booking.description && (
-        <div className="mb-6 rounded-lg bg-gray-50 p-4">
+        <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 font-medium text-gray-700">Description</h3>
           <p className="text-sm text-gray-600">{booking.description}</p>
         </div>

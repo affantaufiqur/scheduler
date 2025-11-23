@@ -25,7 +25,7 @@ export function BookingCard({
   showDetails = true,
 }: BookingCardProps) {
   const navigate = useNavigate();
-  const isPast = isBookingPast(startTime, userTimezone);
+  const isPast = isBookingPast(endTime, userTimezone);
 
   const handleViewDetails = () => {
     navigate({ to: `/app/${id}` });

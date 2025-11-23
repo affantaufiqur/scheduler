@@ -24,5 +24,6 @@ export const getOrganizerSettings = createServerFn({ method: "GET" })
       createdAt: settings.createdAt,
       updatedAt: settings.updatedAt,
       workingTimezone: settings.workingTimezone as TimeZoneValue,
+      deletedAt: settings.deletedAt || null,
     };
   });

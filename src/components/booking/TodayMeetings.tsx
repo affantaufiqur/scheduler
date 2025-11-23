@@ -2,15 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Calendar, Clock, User } from "lucide-react";
 import { getTodayBookings } from "@/functions/booking/get-user-bookings";
-import { BookingCard } from "./BookingCard";
 import { formatBookingTime, isBookingPast } from "@/helpers/date-utils";
+import type { OrganizerSettings } from "@/configs/db/schema";
 
 interface TodayMeetingsProps {
   userId: string;
-  userTimezone?: string;
+  settings: OrganizerSettings;
 }
 
-export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsProps) {
+export function TodayMeetings({ userId, settings }: TodayMeetingsProps) {
+  const userTimezone = settings.workingTimezone || "local";
   const getTodayBookingsFn = useServerFn(getTodayBookings);
 
   const {
@@ -19,8 +20,7 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
     error,
   } = useQuery({
     queryKey: ["today-bookings", userId],
-    queryFn: () => getTodayBookingsFn({ data: {} }),
-    refetchInterval: 60000, // Refetch every minute to keep the schedule up to date
+    queryFn: () => getTodayBookingsFn(),
   });
 
   if (isLoading) {
@@ -62,10 +62,7 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
     );
   }
 
-  // Sort bookings by start time
-  const sortedBookings = [...todayBookingsData.bookings].sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-  );
+  const bookings = todayBookingsData.bookings;
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
@@ -76,17 +73,17 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
             <h3 className="text-lg font-medium text-gray-900">Today's Schedule</h3>
           </div>
           <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-            {sortedBookings.length} meeting{sortedBookings.length !== 1 ? "s" : ""}
+            {bookings.length} meeting{bookings.length !== 1 ? "s" : ""}
           </span>
         </div>
       </div>
       <div className="divide-y divide-gray-200">
-        {sortedBookings.map((booking) => {
-          const isPast = isBookingPast(booking.startTime, userTimezone);
+        {bookings.map((booking) => {
+          const isPast = isBookingPast(booking.endTime, userTimezone);
           return (
             <div
               key={booking.id}
-              className={`p-4 ${isPast ? "bg-gray-50" : "hover:bg-gray-50"} cursor-pointer transition-colors`}
+              className={`p-4 ${isPast ? "bg-red-50" : "hover:bg-gray-50"} cursor-pointer transition-colors`}
               onClick={() => {
                 window.location.href = `/app/${booking.id}`;
               }}
@@ -109,7 +106,7 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center text-sm">
                       <Clock
-                        className={`mr-2 h-4 w-4 flex-shrink-0 ${isPast ? "text-gray-400" : "text-gray-500"}`}
+                        className={`mr-2 h-4 w-4 shrink-0 ${isPast ? "text-gray-400" : "text-gray-500"}`}
                       />
                       <span className={isPast ? "text-gray-500" : "text-gray-900"}>
                         {formatBookingTime(booking.startTime, booking.endTime, userTimezone, true)}
@@ -117,7 +114,7 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
                     </div>
                     <div className="flex items-center text-sm">
                       <User
-                        className={`mr-2 h-4 w-4 flex-shrink-0 ${isPast ? "text-gray-400" : "text-gray-500"}`}
+                        className={`mr-2 h-4 w-4 shrink-0 ${isPast ? "text-gray-400" : "text-gray-500"}`}
                       />
                       <span className={isPast ? "text-gray-500" : "text-gray-900"}>
                         {booking.attendantName}
@@ -125,7 +122,7 @@ export function TodayMeetings({ userId, userTimezone = "local" }: TodayMeetingsP
                     </div>
                   </div>
                 </div>
-                <div className="ml-4 flex-shrink-0">
+                <div className="ml-4 shrink-0">
                   <button
                     className={`inline-flex items-center rounded-md border px-3 py-1 text-xs font-medium transition-colors ${
                       isPast

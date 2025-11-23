@@ -62,8 +62,8 @@ export function isBookingToday(startTime: string, timezone: string = "local"): b
   return displayBookingDate.hasSame(now, "day");
 }
 
-export function isBookingPast(startTime: string, timezone: string = "local"): boolean {
-  const bookingDate = DateTime.fromISO(startTime);
+export function isBookingPast(endTime: string, timezone: string = "local"): boolean {
+  const bookingDate = DateTime.fromISO(endTime); // UTC end time
   const now = timezone === "local" ? DateTime.now() : DateTime.now().setZone(timezone);
   const displayBookingDate =
     timezone === "local" ? bookingDate.toLocal() : bookingDate.setZone(timezone);
@@ -72,7 +72,8 @@ export function isBookingPast(startTime: string, timezone: string = "local"): bo
     return false;
   }
 
-  return displayBookingDate < now;
+  // The booking is considered past if its end time is at or before the current time.
+  return now >= displayBookingDate;
 }
 
 export function getDuration(startTime: string, endTime: string): number {

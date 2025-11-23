@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getBookingsByOrganizerId, getBookingsByOrganizerInDateRange } from "@/service/bookings";
 import { authMiddleware } from "@/middleware/auth";
 import { DateTime } from "luxon";
+import { getOrganizerSettings } from "@/service/organizer-settings";
 
 export const getUserBookingsSchema = z.object({
   page: z.number().min(1).optional().default(1),
@@ -74,9 +75,20 @@ export const getTodayBookings = createServerFn({ method: "GET" })
       throw new Error("User not authenticated");
     }
 
+    // bookings will always be in UTC in the database
     const today = DateTime.utc();
-    const startOfDay = today.startOf("day");
-    const endOfDay = today.endOf("day");
+
+    // Get start and end of today in UTC
+    // But we need to consider user's timezone from their settings
+    // So we should get user's organizer settings first
+    // Then convert start and end of day to user's timezone
+    const userSettings = await getOrganizerSettings(user.id);
+    if (!userSettings) {
+      throw new Error("User settings not found");
+    }
+
+    const startOfDay = today.setZone(userSettings.workingTimezone).startOf("day").toUTC();
+    const endOfDay = today.setZone(userSettings.workingTimezone).endOf("day").toUTC();
 
     const bookings = await getBookingsByOrganizerInDateRange(
       user.id,

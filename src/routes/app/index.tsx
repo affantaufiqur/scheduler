@@ -29,6 +29,14 @@ function RouteComponent() {
     );
   }
 
+  if (!settings) {
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        Error loading organizer settings.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 py-4 lg:grid-cols-3">
       <div className="lg:col-span-2">
@@ -39,7 +47,7 @@ function RouteComponent() {
         <BookingList userId={user.id} userTimezone={userTimezone} />
       </div>
       <div className="lg:col-span-1">
-        <TodayMeetings userId={user.id} userTimezone={userTimezone} />
+        <TodayMeetings userId={user.id} settings={settings} />
       </div>
     </div>
   );

@@ -39,10 +39,6 @@ export async function getBookingsByOrganizerInDateRange(
   startDateUTC: Date,
   endDateUTC: Date,
 ): Promise<Booking[]> {
-  // Set end date to end of day to include the full date range
-  const endDateWithTime = new Date(endDateUTC);
-  endDateWithTime.setHours(23, 59, 59, 999);
-
   const result = await db
     .select()
     .from(bookingsTable)
@@ -50,7 +46,7 @@ export async function getBookingsByOrganizerInDateRange(
       and(
         eq(bookingsTable.organizerId, organizerId),
         gte(bookingsTable.startTime, startDateUTC),
-        lte(bookingsTable.startTime, endDateWithTime),
+        lte(bookingsTable.startTime, endDateUTC),
         isNull(bookingsTable.deletedAt),
       ),
     )

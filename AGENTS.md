@@ -11,7 +11,7 @@ We are building a meeting scheduler. The system prioritizes **data integrity** (
 - **Database:** PostgreSQL (via Drizzle ORM).
 - **Infrastructure:** Redis (for Distributed Locking & Session Management).
 - **Styling:** Tailwind CSS.
-- **Date Handling:** `date-fns` + `date-fns-timezone` (Timezones are critical).
+- **Date Handling:** `luxon` (Timezones are critical).
 
 ## 3. Coding Standards & Style
 

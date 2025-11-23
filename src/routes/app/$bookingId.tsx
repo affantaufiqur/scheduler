@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getBookingDetails } from "@/functions/booking/get-booking-details";
 import { formatBookingTime, formatBookingDate, getDuration } from "@/helpers/date-utils";
-import { ArrowLeft, Calendar, Clock, User, Mail } from "lucide-react";
+import { ArrowLeft, Clock, Mail } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { authMiddleware } from "@/middleware/auth";
-import { getOrganizerSettings } from "@/functions";
+import { getOrganizerSettings, cancelBooking } from "@/functions";
+import { toast } from "sonner";
 
 const server = createServerFn({ method: "GET" }).handler(async () => {
   const userSettings = await getOrganizerSettings();
@@ -22,9 +22,10 @@ export const Route = createFileRoute("/app/$bookingId")({
 
 function RouteComponent() {
   const { bookingId } = Route.useParams();
-  const { settings } = Route.useRouteContext();
+  const { settings, user } = Route.useRouteContext();
   const navigate = useNavigate();
   const getBookingDetailsFn = useServerFn(getBookingDetails);
+  const cancelBookingFn = useServerFn(cancelBooking);
 
   const {
     data: booking,
@@ -39,6 +40,17 @@ function RouteComponent() {
           includeOrganizerDetails: true,
         },
       }),
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (data: { bookingId: string; username: string }) => cancelBookingFn({ data }),
+    onSuccess: () => {
+      toast.success("Settings updated successfully!");
+      navigate({ to: "/app" });
+    },
+    onError: () => {
+      toast.error("Failed to update settings");
+    },
   });
 
   const handleGoBack = () => {
@@ -204,7 +216,12 @@ function RouteComponent() {
                       <Clock className="mr-2 h-4 w-4" />
                       Reschedule
                     </button>
-                    <button className="inline-flex items-center rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none">
+                    <button
+                      onClick={() =>
+                        cancelMutation.mutate({ bookingId: booking.id, username: user.username })
+                      }
+                      className="inline-flex items-center rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+                    >
                       Cancel Booking
                     </button>
                   </>

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/app/route'
+import { Route as UsernameRouteRouteImport } from './routes/$username/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
@@ -26,6 +27,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsernameRouteRoute = UsernameRouteRouteImport.update({
+  id: '/$username',
+  path: '/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -91,6 +97,7 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$username': typeof UsernameRouteRoute
   '/app': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$username'
     | '/app'
     | '/app/'
     | '/demo/api/names'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$username'
     | '/app'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/$username'
     | '/app'
     | '/app/'
     | '/demo/api/names'
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UsernameRouteRoute: typeof UsernameRouteRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$username': {
+      id: '/$username'
+      path: '/$username'
+      fullPath: '/$username'
+      preLoaderRoute: typeof UsernameRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -307,6 +327,7 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UsernameRouteRoute: UsernameRouteRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

@@ -29,6 +29,13 @@
       "when": 1763820957657,
       "tag": "0003_aspiring_ghost_rider",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1763880548507,
+      "tag": "0004_loose_sauron",
+      "breakpoints": true
     }
   ]
 }

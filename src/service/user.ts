@@ -145,6 +145,14 @@ export async function getUserByEmail(email: string) {
     .limit(1);
 }
 
+export async function getUserByUsername(username: string) {
+  return await db
+    .select({ id: userTable.id, username: userTable.username, email: userTable.email })
+    .from(userTable)
+    .where(eq(userTable.username, username))
+    .limit(1);
+}
+
 export async function loginUser(userData: z.infer<typeof loginSchema>) {
   const { email, password } = userData;
 

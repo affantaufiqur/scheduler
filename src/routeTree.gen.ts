@@ -13,6 +13,7 @@ import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as UsernameRouteRouteImport } from './routes/$username/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppBookingIdRouteImport } from './routes/app/$bookingId'
 import { Route as AppSettingsIndexRouteImport } from './routes/app/settings/index'
 import { Route as authRegisterIndexRouteImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexRouteImport } from './routes/(auth)/login/index'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppBookingIdRoute = AppBookingIdRouteImport.update({
+  id: '/$bookingId',
+  path: '/$bookingId',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/app/$bookingId': typeof AppBookingIdRoute
   '/app/': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
+  '/app/$bookingId': typeof AppBookingIdRoute
   '/app': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/app/$bookingId': typeof AppBookingIdRoute
   '/app/': typeof AppIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$username'
     | '/app'
+    | '/app/$bookingId'
     | '/app/'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$username'
+    | '/app/$bookingId'
     | '/app'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$username'
     | '/app'
+    | '/app/$bookingId'
     | '/app/'
     | '/demo/api/names'
     | '/demo/start/api-request'
@@ -236,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/$bookingId': {
+      id: '/app/$bookingId'
+      path: '/$bookingId'
+      fullPath: '/app/$bookingId'
+      preLoaderRoute: typeof AppBookingIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/settings/': {
@@ -312,11 +331,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteRouteChildren {
+  AppBookingIdRoute: typeof AppBookingIdRoute
   AppIndexRoute: typeof AppIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppBookingIdRoute: AppBookingIdRoute,
   AppIndexRoute: AppIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
 }

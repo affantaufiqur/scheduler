@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getBookingById } from "@/service/bookings";
-import { getUserById, getUserByUsername } from "@/service/user";
+import { getUserById } from "@/service/user";
 import { notFound } from "@tanstack/react-router";
 
 export const getBookingDetailsSchema = z.object({

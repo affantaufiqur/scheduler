@@ -4,7 +4,7 @@ import { eq, and, isNull, gte, lte } from "drizzle-orm";
 import { Booking, NewBooking } from "@/configs/db/schema/bookings";
 
 export async function createBooking(
-  booking: Omit<NewBooking, "id" | "createdAt" | "updatedAt">
+  booking: Omit<NewBooking, "id" | "createdAt" | "updatedAt">,
 ): Promise<Booking | null> {
   const bookingData: NewBooking = {
     ...booking,
@@ -37,7 +37,7 @@ export async function getBookingsByOrganizerId(organizerId: string): Promise<Boo
 export async function getBookingsByOrganizerInDateRange(
   organizerId: string,
   startDateUTC: Date,
-  endDateUTC: Date
+  endDateUTC: Date,
 ): Promise<Booking[]> {
   // Set end date to end of day to include the full date range
   const endDateWithTime = new Date(endDateUTC);
@@ -61,7 +61,7 @@ export async function getBookingsByOrganizerInDateRange(
 
 export async function updateBooking(
   id: string,
-  booking: Partial<Omit<NewBooking, "id" | "createdAt" | "updatedAt">>
+  booking: Partial<Omit<NewBooking, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Booking | null> {
   if (!booking || Object.keys(booking).length === 0) {
     return null;

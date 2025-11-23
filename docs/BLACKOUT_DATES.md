@@ -27,46 +27,58 @@ The `blackout_dates` table stores individual blackout dates with the following f
 ### CRUD Operations
 
 #### `createBlackoutDate(userId, blackoutDate)`
+
 Creates a new blackout date for a user.
+
 ```typescript
 const blackoutDate = await createBlackoutDate(userId, {
-  date: new Date('2025-12-25'),
-  reason: 'Christmas holiday'
+  date: new Date("2025-12-25"),
+  reason: "Christmas holiday",
 });
 ```
 
 #### `getBlackoutDatesByUserId(userId)`
+
 Retrieves all active blackout dates for a user, ordered by date.
+
 ```typescript
 const blackoutDates = await getBlackoutDatesByUserId(userId);
 ```
 
 #### `getBlackoutDatesByUserIdAndDateRange(userId, startDate, endDate)`
+
 Retrieves blackout dates within a specific date range.
+
 ```typescript
 const blackoutDates = await getBlackoutDatesByUserIdAndDateRange(
   userId,
-  new Date('2025-12-01'),
-  new Date('2025-12-31')
+  new Date("2025-12-01"),
+  new Date("2025-12-31"),
 );
 ```
 
 #### `getBlackoutDateById(id)`
+
 Retrieves a specific blackout date by ID.
+
 ```typescript
 const blackoutDate = await getBlackoutDateById(id);
 ```
 
 #### `updateBlackoutDateById(id, updates)`
+
 Updates an existing blackout date.
+
 ```typescript
 const updated = await updateBlackoutDateById(id, {
-  reason: 'Updated reason'
+  reason: "Updated reason",
 });
 ```
 
 #### `deleteBlackoutDate(id)`
+
 Soft deletes a blackout date (marks as deleted without removing data).
+
 ```typescript
 const success = await deleteBlackoutDate(id);
 ```
@@ -74,20 +86,24 @@ const success = await deleteBlackoutDate(id);
 ### Batch Operations
 
 #### `bulkUpsertBlackoutDates(userId, blackoutDates)`
+
 Efficiently creates or updates multiple blackout dates at once.
+
 ```typescript
 const results = await bulkUpsertBlackoutDates(userId, [
-  { date: new Date('2025-12-25'), reason: 'Christmas' },
-  { date: new Date('2025-12-31'), reason: 'New Years Eve' }
+  { date: new Date("2025-12-25"), reason: "Christmas" },
+  { date: new Date("2025-12-31"), reason: "New Years Eve" },
 ]);
 ```
 
 ### Utility Functions
 
 #### `isDateBlackouted(userId, date)`
+
 Checks if a specific date is blocked for a user.
+
 ```typescript
-const isBlocked = await isDateBlackouted(userId, new Date('2025-12-25'));
+const isBlocked = await isDateBlackouted(userId, new Date("2025-12-25"));
 ```
 
 ## Integration with Availability Engine
@@ -102,29 +118,32 @@ Blackout dates are used in the availability engine to filter out unavailable dat
 ## Common Use Cases
 
 ### Holidays
+
 ```typescript
 // Block Christmas week
 await bulkUpsertBlackoutDates(userId, [
-  { date: new Date('2025-12-25'), reason: 'Christmas Day' },
-  { date: new Date('2025-12-26'), reason: 'Christmas Holiday' }
+  { date: new Date("2025-12-25"), reason: "Christmas Day" },
+  { date: new Date("2025-12-26"), reason: "Christmas Holiday" },
 ]);
 ```
 
 ### Personal Days
+
 ```typescript
 // Block a personal day
 await createBlackoutDate(userId, {
-  date: new Date('2025-11-28'),
-  reason: 'Personal day - doctor appointment'
+  date: new Date("2025-11-28"),
+  reason: "Personal day - doctor appointment",
 });
 ```
 
 ### Company Events
+
 ```typescript
 // Block company retreat days
 await bulkUpsertBlackoutDates(userId, [
-  { date: new Date('2025-03-15'), reason: 'Company Retreat' },
-  { date: new Date('2025-03-16'), reason: 'Company Retreat' }
+  { date: new Date("2025-03-15"), reason: "Company Retreat" },
+  { date: new Date("2025-03-16"), reason: "Company Retreat" },
 ]);
 ```
 

@@ -9,7 +9,9 @@ The authentication system has been refactored from a monolithic approach where s
 ## What Was Changed
 
 ### 1. Server Functions Extraction
+
 **Before**: Server functions were defined directly in route components
+
 ```tsx
 // src/routes/(auth)/login/index.tsx (OLD)
 export const login = createServerFn({ method: "POST" })
@@ -20,6 +22,7 @@ export const login = createServerFn({ method: "POST" })
 ```
 
 **After**: Server functions are now in dedicated API layer files
+
 ```tsx
 // src/functions/auth/login.ts (NEW)
 export const login = createServerFn({ method: "POST" })
@@ -30,13 +33,16 @@ export const login = createServerFn({ method: "POST" })
 ```
 
 ### 2. Component Refactoring
+
 **Before**: Components imported and used server functions directly
+
 ```tsx
 // Login component called login() directly
 const req = await login({ data: {...} });
 ```
 
 **After**: Components use the `useServerFn` hook
+
 ```tsx
 // Login component uses useServerFn hook
 const loginFn = useServerFn(login);
@@ -44,6 +50,7 @@ const req = await loginFn({ data: {...} });
 ```
 
 ### 3. Layer Separation
+
 The authentication flow now follows the three-layer pattern:
 
 - **View Layer**: `src/routes/(auth)/*` - UI components only
@@ -53,8 +60,9 @@ The authentication flow now follows the three-layer pattern:
 ## Files Created/Modified
 
 ### New Files
+
 - `src/functions/auth/login.ts` - Login server function
-- `src/functions/auth/register.ts` - Register server function  
+- `src/functions/auth/register.ts` - Register server function
 - `src/functions/auth/middleware.ts` - Auth middleware server function
 - `src/functions/index.ts` - Barrel exports for server functions
 - `docs/ARCHITECTURE.md` - Architecture documentation
@@ -62,6 +70,7 @@ The authentication flow now follows the three-layer pattern:
 - `docs/AUTHENTICATION_REFACTOR.md` - This document
 
 ### Modified Files
+
 - `src/routes/(auth)/login/index.tsx` - Removed server function, added useServerFn
 - `src/routes/(auth)/register/index.tsx` - Removed server function, added useServerFn
 - `src/service/user.ts` - Updated imports to use new schema locations
@@ -69,21 +78,25 @@ The authentication flow now follows the three-layer pattern:
 ## Benefits Achieved
 
 ### 1. Separation of Concerns
+
 - UI components now only handle presentation and user interactions
 - Server functions handle validation, authentication, and API concerns
 - Service layer contains pure business logic without framework dependencies
 
 ### 2. Testability
+
 - Service layer can be unit tested independently
 - Server functions can be tested with mocked service layer
 - UI components can be tested with mocked server functions
 
 ### 3. Maintainability
+
 - Clear boundaries between layers make code easier to understand
 - Changes to business logic only affect the service layer
 - UI changes don't impact authentication logic
 
 ### 4. Reusability
+
 - Server functions can be called from multiple components
 - Service functions can be reused across different server functions
 - Validation schemas can be imported and reused
@@ -115,7 +128,7 @@ All future features should follow this three-layer architecture to maintain cons
 ## Migration Checklist
 
 - [x] Extract login server function to API layer
-- [x] Extract register server function to API layer  
+- [x] Extract register server function to API layer
 - [x] Update components to use useServerFn hook
 - [x] Fix import statements in service layer
 - [x] Remove unused imports from middleware

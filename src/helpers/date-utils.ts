@@ -4,7 +4,7 @@ export function formatBookingTime(
   startTime: string,
   endTime: string,
   timezone: string = "local",
-  use24Hour: boolean = true
+  use24Hour: boolean = true,
 ): string {
   const start = DateTime.fromISO(startTime);
   const end = DateTime.fromISO(endTime);
@@ -23,10 +23,7 @@ export function formatBookingTime(
   }`;
 }
 
-export function formatBookingDate(
-  startTime: string,
-  timezone: string = "local"
-): string {
+export function formatBookingDate(startTime: string, timezone: string = "local"): string {
   const start = DateTime.fromISO(startTime);
 
   if (!start.isValid) {
@@ -42,21 +39,22 @@ export function formatBookingDateTime(
   startTime: string,
   endTime: string,
   timezone: string = "local",
-  use24Hour: boolean = true
+  use24Hour: boolean = true,
 ): string {
   return `${formatBookingDate(startTime, timezone)} at ${formatBookingTime(
     startTime,
     endTime,
     timezone,
-    use24Hour
+    use24Hour,
   )}`;
 }
 
 export function isBookingToday(startTime: string, timezone: string = "local"): boolean {
   const bookingDate = DateTime.fromISO(startTime);
   const now = timezone === "local" ? DateTime.now() : DateTime.now().setZone(timezone);
-  const displayBookingDate = timezone === "local" ? bookingDate.toLocal() : bookingDate.setZone(timezone);
-  
+  const displayBookingDate =
+    timezone === "local" ? bookingDate.toLocal() : bookingDate.setZone(timezone);
+
   if (!displayBookingDate.isValid) {
     return false;
   }
@@ -67,8 +65,9 @@ export function isBookingToday(startTime: string, timezone: string = "local"): b
 export function isBookingPast(startTime: string, timezone: string = "local"): boolean {
   const bookingDate = DateTime.fromISO(startTime);
   const now = timezone === "local" ? DateTime.now() : DateTime.now().setZone(timezone);
-  const displayBookingDate = timezone === "local" ? bookingDate.toLocal() : bookingDate.setZone(timezone);
-  
+  const displayBookingDate =
+    timezone === "local" ? bookingDate.toLocal() : bookingDate.setZone(timezone);
+
   if (!displayBookingDate.isValid) {
     return false;
   }

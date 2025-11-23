@@ -9,13 +9,15 @@ Root.displayName = "Textarea.Root";
 
 type TextareaLabelProps = React.LabelHTMLAttributes<HTMLLabelElement>;
 
-const Label = forwardRef<HTMLLabelElement, TextareaLabelProps>(({ className = "", ...props }, ref) => (
-  <label
-    ref={ref}
-    className={`block text-sm font-medium text-black ${className}`.trim()}
-    {...props}
-  />
-));
+const Label = forwardRef<HTMLLabelElement, TextareaLabelProps>(
+  ({ className = "", ...props }, ref) => (
+    <label
+      ref={ref}
+      className={`block text-sm font-medium text-black ${className}`.trim()}
+      {...props}
+    />
+  ),
+);
 Label.displayName = "Textarea.Label";
 
 type TextareaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -29,7 +31,7 @@ const Field = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
     return (
       <textarea
         ref={ref}
-        className={`w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none resize-y min-h-[80px] ${
+        className={`min-h-[80px] w-full resize-y rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:outline-none ${
           hasError
             ? "border-red-500 bg-white text-black focus:border-red-600 focus:ring-red-600"
             : "bg-white text-black focus:border-blue-500 focus:ring-blue-500"

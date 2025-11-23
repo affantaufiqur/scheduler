@@ -23,16 +23,20 @@ export const getUserBookings = createServerFn({ method: "GET" })
     }
 
     let bookings;
-    
+
     if (startDate && endDate) {
       const startUTC = DateTime.fromISO(startDate, { zone: "utc" }).toUTC();
       const endUTC = DateTime.fromISO(endDate, { zone: "utc" }).toUTC();
-      
+
       if (!startUTC.isValid || !endUTC.isValid) {
         throw new Error("Invalid date range provided");
       }
-      
-      bookings = await getBookingsByOrganizerInDateRange(user.id, startUTC.toJSDate(), endUTC.toJSDate());
+
+      bookings = await getBookingsByOrganizerInDateRange(
+        user.id,
+        startUTC.toJSDate(),
+        endUTC.toJSDate(),
+      );
     } else {
       bookings = await getBookingsByOrganizerId(user.id);
     }
@@ -41,7 +45,7 @@ export const getUserBookings = createServerFn({ method: "GET" })
     const paginatedBookings = bookings.slice(offset, offset + limit);
 
     return {
-      bookings: paginatedBookings.map(booking => ({
+      bookings: paginatedBookings.map((booking) => ({
         id: booking.id,
         attendantName: booking.attendantName,
         attendantEmail: booking.attendantEmail,
@@ -77,11 +81,11 @@ export const getTodayBookings = createServerFn({ method: "GET" })
     const bookings = await getBookingsByOrganizerInDateRange(
       user.id,
       startOfDay.toJSDate(),
-      endOfDay.toJSDate()
+      endOfDay.toJSDate(),
     );
 
     return {
-      bookings: bookings.map(booking => ({
+      bookings: bookings.map((booking) => ({
         id: booking.id,
         attendantName: booking.attendantName,
         attendantEmail: booking.attendantEmail,

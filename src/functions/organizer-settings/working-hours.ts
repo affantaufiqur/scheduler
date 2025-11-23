@@ -1,18 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/middleware/auth";
-import { 
-  getWorkingHoursByUserId, 
-  createWorkingHours, 
-  updateWorkingHours, 
-  deleteWorkingHours, 
+import {
+  getWorkingHoursByUserId,
+  createWorkingHours,
+  updateWorkingHours,
+  deleteWorkingHours,
   bulkUpdateWorkingHours,
-  setDefaultWorkingHours 
+  setDefaultWorkingHours,
 } from "@/service/working-hours";
-import { 
-  workingHoursSchema, 
-  bulkWorkingHoursSchema, 
-  WorkingHoursData, 
-  BulkWorkingHoursData 
+import {
+  workingHoursSchema,
+  bulkWorkingHoursSchema,
+  WorkingHoursData,
+  BulkWorkingHoursData,
 } from "./schema";
 
 export const getWorkingHours = createServerFn({ method: "GET" })
@@ -47,8 +47,8 @@ export const createWorkingHoursFn = createServerFn({ method: "POST" })
 
 export const updateWorkingHoursFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator((data: WorkingHoursData & { id: string }) => 
-    workingHoursSchema.required({ id: true }).parse(data)
+  .inputValidator((data: WorkingHoursData & { id: string }) =>
+    workingHoursSchema.required({ id: true }).parse(data),
   )
   .handler(async ({ data }) => {
     const { id, ...updateData } = data;

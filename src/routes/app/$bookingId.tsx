@@ -108,7 +108,11 @@ function RouteComponent() {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700">Time</h3>
                   <p className="mt-1 text-sm text-gray-900">
-                    {formatBookingTime(booking.startTime, booking.endTime, settings?.workingTimezone)}
+                    {formatBookingTime(
+                      booking.startTime,
+                      booking.endTime,
+                      settings?.workingTimezone,
+                    )}
                   </p>
                 </div>
 
@@ -193,7 +197,7 @@ function RouteComponent() {
                 </Link>
                 {!isPast && (
                   <>
-                    <button 
+                    <button
                       onClick={handleReschedule}
                       className="inline-flex items-center rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                     >

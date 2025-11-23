@@ -25,7 +25,7 @@ export const blackoutDatesTable = pgTable(
     userDateUnique: unique("blackout_dates_user_date_unique").on(
       table.userId,
       table.date,
-      table.deletedAt
+      table.deletedAt,
     ),
   }),
 );

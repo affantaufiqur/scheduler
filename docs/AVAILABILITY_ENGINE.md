@@ -156,6 +156,7 @@ export function getTimeWindowInTimezone(settings: OrganizerSettings): TimeWindow
 ```
 
 **Design Decisions:**
+
 - Luxon's `DateTime.now().setZone()` converts to organizer's timezone automatically
 - `startOf("day")` gets midnight in that timezone context (handles DST automatically)
 - `.toUTC()` returns the equivalent UTC DateTime
@@ -346,31 +347,31 @@ export function applyBusinessRulesToSlots(
 
 ```typescript
 interface CandidateSlot {
-  startTimeUTC: DateTime;      // UTC timestamp for storage
-  endTimeUTC: DateTime;        // UTC timestamp for storage
-  duration: number;            // Minutes
+  startTimeUTC: DateTime; // UTC timestamp for storage
+  endTimeUTC: DateTime; // UTC timestamp for storage
+  duration: number; // Minutes
 }
 
 interface BufferedBooking extends Booking {
-  bufferedStartUTC: DateTime;  // Start minus pre-buffer
-  bufferedEndUTC: DateTime;    // End plus post-buffer
-  originalStartUTC: DateTime;  // Original booking start
-  originalEndUTC: DateTime;    // Original booking end
+  bufferedStartUTC: DateTime; // Start minus pre-buffer
+  bufferedEndUTC: DateTime; // End plus post-buffer
+  originalStartUTC: DateTime; // Original booking start
+  originalEndUTC: DateTime; // Original booking end
 }
 
 interface AvailableSlot {
-  startTime: Date;             // UTC (JS Date for DB)
-  endTime: Date;               // UTC (JS Date for DB)
-  duration: number;            // Minutes
-  timezone: string;            // Organizer's timezone (for reference)
+  startTime: Date; // UTC (JS Date for DB)
+  endTime: Date; // UTC (JS Date for DB)
+  duration: number; // Minutes
+  timezone: string; // Organizer's timezone (for reference)
   available: boolean;
 }
 
 interface TimeWindow {
-  startInTZ: DateTime;         // Window start in organizer's timezone
-  endInTZ: DateTime;           // Window end in organizer's timezone
-  startUTC: DateTime;          // Window start in UTC
-  endUTC: DateTime;            // Window end in UTC
+  startInTZ: DateTime; // Window start in organizer's timezone
+  endInTZ: DateTime; // Window end in organizer's timezone
+  startUTC: DateTime; // Window start in UTC
+  endUTC: DateTime; // Window end in UTC
 }
 ```
 
@@ -440,7 +441,7 @@ export const getAvailableSlotsByUsernameSchema = z.object({
 async function getBookingsByOrganizerInDateRange(
   organizerId: string,
   startDateUTC: DateTime,
-  endDateUTC: DateTime
+  endDateUTC: DateTime,
 ): Promise<Booking[]> {
   // Convert DateTime to native Date for Drizzle
   const startDate = startDateUTC.toJSDate();
@@ -454,13 +455,14 @@ async function getBookingsByOrganizerInDateRange(
         eq(bookingsTable.organizerId, organizerId),
         gte(bookingsTable.startTime, startDate),
         lte(bookingsTable.startTime, endDate),
-        isNull(bookingsTable.deletedAt)
-      )
+        isNull(bookingsTable.deletedAt),
+      ),
     );
 }
 ```
 
 **Optimizations:**
+
 - Composite index on (organizerId, startTime) required
 - Filters for active bookings only
 - Limits query to time window
@@ -528,12 +530,14 @@ function mergeOverlappingWorkingHours(workingHours: WorkingHours[]): WorkingHour
 ### Working Hours Spanning Midnight
 
 Working hours should not span midnight in the schema. If needed, store as two separate entries for different days:
+
 - Day 1: 22:00 to 23:59:59
 - Day 2: 00:00 to 02:00
 
 ### Timezones with Half-Hour Offsets
 
 Luxon handles all IANA timezone offsets automatically, including:
+
 - UTC+5:30 (India)
 - UTC+9:45 (Australia/Eucla)
 - UTC+5:45 (Nepal)
@@ -556,10 +560,7 @@ const { slots } = await calculateAvailableSlots(organizerId);
 const isSlotAvailable = slots.some((slot) => {
   const slotStart = new Date(slot.startTime);
   const slotEnd = new Date(slot.endTime);
-  return (
-    slotStart.getTime() === startTime.getTime() && 
-    slotEnd.getTime() === endTime.getTime()
-  );
+  return slotStart.getTime() === startTime.getTime() && slotEnd.getTime() === endTime.getTime();
 });
 
 if (!isSlotAvailable) {

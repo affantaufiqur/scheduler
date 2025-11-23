@@ -1,12 +1,12 @@
 export { getOrganizerSettings } from "./get";
 export { updateOrganizerSettings } from "./update";
-export { 
+export {
   getWorkingHours,
   createWorkingHoursFn,
   updateWorkingHoursFn,
   deleteWorkingHoursFn,
   bulkUpdateWorkingHoursFn,
-  setDefaultWorkingHoursFn
+  setDefaultWorkingHoursFn,
 } from "./working-hours";
 export {
   getBlackoutDates,
@@ -14,15 +14,7 @@ export {
   createBlackoutDateFn,
   updateBlackoutDateFn,
   deleteBlackoutDateFn,
-  bulkUpsertBlackoutDatesFn
+  bulkUpsertBlackoutDatesFn,
 } from "./blackout-days";
-export { 
-  organizerSettingsSchema,
-  workingHoursSchema,
-  bulkWorkingHoursSchema
-} from "./schema";
-export type { 
-  OrganizerSettingsData,
-  WorkingHoursData,
-  BulkWorkingHoursData
-} from "./schema";
+export { organizerSettingsSchema, workingHoursSchema, bulkWorkingHoursSchema } from "./schema";
+export type { OrganizerSettingsData, WorkingHoursData, BulkWorkingHoursData } from "./schema";

@@ -104,7 +104,10 @@ export const bookingsTable = pgTable(
   },
   (table) => ({
     organizerIdIndex: index("bookings_organizer_id_idx").on(table.organizerId),
-    organizerStartTimeIndex: index("bookings_organizer_start_time_idx").on(table.organizerId, table.startTime),
+    organizerStartTimeIndex: index("bookings_organizer_start_time_idx").on(
+      table.organizerId,
+      table.startTime,
+    ),
   }),
 );
 
@@ -131,7 +134,7 @@ Creates a new booking record in the database.
 
 ```typescript
 export async function createBooking(
-  booking: Omit<NewBooking, "id" | "createdAt" | "updatedAt">
+  booking: Omit<NewBooking, "id" | "createdAt" | "updatedAt">,
 ): Promise<Booking | null> {
   const bookingData: NewBooking = {
     ...booking,
@@ -182,7 +185,7 @@ Retrieves bookings for an organizer within a specific date range.
 export async function getBookingsByOrganizerInDateRange(
   organizerId: string,
   startDateUTC: Date,
-  endDateUTC: Date
+  endDateUTC: Date,
 ): Promise<Booking[]> {
   // Set end date to end of day to include the full date range
   const endDateWithTime = new Date(endDateUTC);
@@ -296,8 +299,7 @@ export const createBooking = createServerFn({ method: "POST" })
         const slotStart = new Date(slot.startTime);
         const slotEnd = new Date(slot.endTime);
         return (
-          slotStart.getTime() === startTime.getTime() && 
-          slotEnd.getTime() === endTime.getTime()
+          slotStart.getTime() === startTime.getTime() && slotEnd.getTime() === endTime.getTime()
         );
       });
 
@@ -377,16 +379,20 @@ export const getUserBookings = createServerFn({ method: "GET" })
     }
 
     let bookings;
-    
+
     if (startDate && endDate) {
       const startUTC = DateTime.fromISO(startDate, { zone: "utc" }).toUTC();
       const endUTC = DateTime.fromISO(endDate, { zone: "utc" }).toUTC();
-      
+
       if (!startUTC.isValid || !endUTC.isValid) {
         throw new Error("Invalid date range provided");
       }
-      
-      bookings = await getBookingsByOrganizerInDateRange(user.id, startUTC.toJSDate(), endUTC.toJSDate());
+
+      bookings = await getBookingsByOrganizerInDateRange(
+        user.id,
+        startUTC.toJSDate(),
+        endUTC.toJSDate(),
+      );
     } else {
       bookings = await getBookingsByOrganizerId(user.id);
     }
@@ -395,7 +401,7 @@ export const getUserBookings = createServerFn({ method: "GET" })
     const paginatedBookings = bookings.slice(offset, offset + limit);
 
     return {
-      bookings: paginatedBookings.map(booking => ({
+      bookings: paginatedBookings.map((booking) => ({
         id: booking.id,
         attendantName: booking.attendantName,
         attendantEmail: booking.attendantEmail,
@@ -516,10 +522,7 @@ const { slots } = await calculateAvailableSlots(organizerId);
 const isSlotAvailable = slots.some((slot) => {
   const slotStart = new Date(slot.startTime);
   const slotEnd = new Date(slot.endTime);
-  return (
-    slotStart.getTime() === startTime.getTime() && 
-    slotEnd.getTime() === endTime.getTime()
-  );
+  return slotStart.getTime() === startTime.getTime() && slotEnd.getTime() === endTime.getTime();
 });
 
 if (!isSlotAvailable) {
@@ -543,10 +546,7 @@ const { slots } = await calculateAvailableSlots(organizerId);
 const isSlotAvailable = slots.some((slot) => {
   const slotStart = new Date(slot.startTime);
   const slotEnd = new Date(slot.endTime);
-  return (
-    slotStart.getTime() === startTime.getTime() && 
-    slotEnd.getTime() === endTime.getTime()
-  );
+  return slotStart.getTime() === startTime.getTime() && slotEnd.getTime() === endTime.getTime();
 });
 ```
 
@@ -578,7 +578,7 @@ const startTimestamp = DateTime.fromJSDate(startTime).toMillis();
 if (startDate && endDate) {
   const startUTC = DateTime.fromISO(startDate, { zone: "utc" }).toUTC();
   const endUTC = DateTime.fromISO(endDate, { zone: "utc" }).toUTC();
-  
+
   if (!startUTC.isValid || !endUTC.isValid) {
     throw new Error("Invalid date range provided");
   }

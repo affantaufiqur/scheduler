@@ -144,7 +144,9 @@ function WorkingHoursPage() {
     <div>
       {workingHours?.map((hours) => (
         <div key={hours.id}>
-          <h3>Day {hours.dayOfWeek}: {hours.startTime} - {hours.endTime}</h3>
+          <h3>
+            Day {hours.dayOfWeek}: {hours.startTime} - {hours.endTime}
+          </h3>
           <p>Active: {hours.isActive ? "Yes" : "No"}</p>
         </div>
       ))}
@@ -294,27 +296,35 @@ All input data is validated using Zod schemas:
 ```typescript
 const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
-const workingHoursSchema = z.object({
-  id: z.string().optional(),
-  dayOfWeek: z.string().refine((val) => {
-    const dayNum = parseInt(val);
-    return !isNaN(dayNum) && dayNum >= 0 && dayNum <= 6;
-  }, { message: "Day of week must be a number between 0-6" }),
-  startTime: z.string().regex(timeRegex, { 
-    message: "Start time must be in HH:mm format (24-hour)" 
-  }),
-  endTime: z.string().regex(timeRegex, { 
-    message: "End time must be in HH:mm format (24-hour)" 
-  }),
-  isActive: z.boolean().default(true),
-}).refine((data) => {
-  // Ensures end time is after start time
-  const startTime = data.startTime.split(":").map(Number);
-  const endTime = data.endTime.split(":").map(Number);
-  const startMinutes = startTime[0] * 60 + startTime[1];
-  const endMinutes = endTime[0] * 60 + endTime[1];
-  return endMinutes > startMinutes;
-}, { message: "End time must be after start time", path: ["endTime"] });
+const workingHoursSchema = z
+  .object({
+    id: z.string().optional(),
+    dayOfWeek: z.string().refine(
+      (val) => {
+        const dayNum = parseInt(val);
+        return !isNaN(dayNum) && dayNum >= 0 && dayNum <= 6;
+      },
+      { message: "Day of week must be a number between 0-6" },
+    ),
+    startTime: z.string().regex(timeRegex, {
+      message: "Start time must be in HH:mm format (24-hour)",
+    }),
+    endTime: z.string().regex(timeRegex, {
+      message: "End time must be in HH:mm format (24-hour)",
+    }),
+    isActive: z.boolean().default(true),
+  })
+  .refine(
+    (data) => {
+      // Ensures end time is after start time
+      const startTime = data.startTime.split(":").map(Number);
+      const endTime = data.endTime.split(":").map(Number);
+      const startMinutes = startTime[0] * 60 + startTime[1];
+      const endMinutes = endTime[0] * 60 + endTime[1];
+      return endMinutes > startMinutes;
+    },
+    { message: "End time must be after start time", path: ["endTime"] },
+  );
 ```
 
 ## Default Values
@@ -322,7 +332,7 @@ const workingHoursSchema = z.object({
 When using `setDefaultWorkingHours()`, the following default schedule is created:
 
 - **Monday (1)**: 09:00 - 17:00
-- **Tuesday (2)**: 09:00 - 17:00  
+- **Tuesday (2)**: 09:00 - 17:00
 - **Wednesday (3)**: 09:00 - 17:00
 - **Thursday (4)**: 09:00 - 17:00
 - **Friday (5)**: 09:00 - 17:00
@@ -406,6 +416,7 @@ Working hours complement the general organizer settings:
 - **Working Hours**: Define specific availability windows for each day of the week
 
 Both work together to determine actual availability for booking:
+
 1. Check if the requested date falls within working hours
 2. Apply organizer settings constraints (buffers, notice periods, etc.)
 3. Check for existing bookings in those time slots

@@ -30,7 +30,10 @@ export async function getWorkingHoursByUserId(userId: string): Promise<WorkingHo
   return result;
 }
 
-export async function getWorkingHoursByDay(userId: string, dayOfWeek: string): Promise<WorkingHours[]> {
+export async function getWorkingHoursByDay(
+  userId: string,
+  dayOfWeek: string,
+): Promise<WorkingHours[]> {
   const result = await db
     .select()
     .from(workingHoursTable)
@@ -38,8 +41,8 @@ export async function getWorkingHoursByDay(userId: string, dayOfWeek: string): P
       and(
         eq(workingHoursTable.userId, userId),
         eq(workingHoursTable.dayOfWeek, dayOfWeek),
-        isNull(workingHoursTable.deletedAt)
-      )
+        isNull(workingHoursTable.deletedAt),
+      ),
     )
     .orderBy(workingHoursTable.startTime);
 
@@ -84,7 +87,14 @@ export async function deleteWorkingHours(id: string): Promise<boolean> {
 
 export async function bulkUpdateWorkingHours(
   userId: string,
-  workingHoursArray: Array<Partial<Omit<NewWorkingHours, "id" | "userId" | "createdAt" | "updatedAt">> & { id?: string; dayOfWeek: string; startTime: string; endTime: string }>,
+  workingHoursArray: Array<
+    Partial<Omit<NewWorkingHours, "id" | "userId" | "createdAt" | "updatedAt">> & {
+      id?: string;
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+    }
+  >,
 ): Promise<WorkingHours[]> {
   if (!workingHoursArray || workingHoursArray.length === 0) {
     return [];

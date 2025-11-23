@@ -27,7 +27,10 @@ export const bookingsTable = pgTable(
   },
   (table) => ({
     organizerIdIndex: index("bookings_organizer_id_idx").on(table.organizerId),
-    organizerStartTimeIndex: index("bookings_organizer_start_time_idx").on(table.organizerId, table.startTime),
+    organizerStartTimeIndex: index("bookings_organizer_start_time_idx").on(
+      table.organizerId,
+      table.startTime,
+    ),
   }),
 );
 

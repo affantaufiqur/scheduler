@@ -29,7 +29,7 @@ export const workingHoursTable = pgTable(
       table.dayOfWeek,
       table.startTime,
       table.endTime,
-      table.deletedAt
+      table.deletedAt,
     ),
   }),
 );

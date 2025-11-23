@@ -75,12 +75,8 @@
           "name": "blackout_dates_user_id_users_id_fk",
           "tableFrom": "blackout_dates",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -90,11 +86,7 @@
         "blackout_dates_user_date_unique": {
           "name": "blackout_dates_user_date_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "date",
-            "deleted_at"
-          ]
+          "columns": ["user_id", "date", "deleted_at"]
         }
       },
       "policies": {},
@@ -223,12 +215,8 @@
           "name": "bookings_organizer_id_users_id_fk",
           "tableFrom": "bookings",
           "tableTo": "users",
-          "columnsFrom": [
-            "organizer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -302,16 +290,12 @@
         "users_username_unique": {
           "name": "users_username_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["username"]
         },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -402,12 +386,8 @@
           "name": "working_hours_user_id_users_id_fk",
           "tableFrom": "working_hours",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -417,13 +397,7 @@
         "working_hours_user_day_time_unique": {
           "name": "working_hours_user_day_time_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "day_of_week",
-            "start_time",
-            "end_time",
-            "deleted_at"
-          ]
+          "columns": ["user_id", "day_of_week", "start_time", "end_time", "deleted_at"]
         }
       },
       "policies": {},
@@ -531,12 +505,8 @@
           "name": "organizer_settings_user_id_users_id_fk",
           "tableFrom": "organizer_settings",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -546,9 +516,7 @@
         "organizer_settings_user_id_unique": {
           "name": "organizer_settings_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},

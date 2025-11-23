@@ -123,7 +123,7 @@ export function BookingForm({
   );
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-md">
+    <div className="rounded-lg border border-gray-200 bg-white p-6">
       <div className="mb-6">
         <button
           onClick={handleBack}
@@ -132,8 +132,8 @@ export function BookingForm({
           ← Back to availability
         </button>
         <h2 className="text-2xl font-bold text-gray-800">Complete Your Booking</h2>
-        
-        <div className="mt-4 rounded-lg bg-gray-50 p-4">
+
+        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <h3 className="text-sm font-medium text-gray-700">Meeting Details</h3>
           <div className="mt-2 space-y-1 text-sm text-gray-600">
             <div>
@@ -141,15 +141,14 @@ export function BookingForm({
               {attendeeStartTime.toFormat("EEEE, MMMM d, yyyy")}
             </div>
             <div>
-              <span className="font-medium">Time:</span>{" "}
-              {attendeeStartTime.toFormat("h:mm a")} - {attendeeEndTime.toFormat("h:mm a")} (
-              {attendeeTimezone})
+              <span className="font-medium">Time:</span> {attendeeStartTime.toFormat("h:mm a")} -{" "}
+              {attendeeEndTime.toFormat("h:mm a")} ({attendeeTimezone}) (Your Local Time)
             </div>
             <div>
               <span className="font-medium">Duration:</span> {slot.duration} minutes
             </div>
             {attendeeTimezone !== slot.timezone && (
-              <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+              <div className="mt-2 border-t border-gray-200 pt-2 text-xs text-gray-500">
                 <div>
                   Organizer's time: {startTime.toFormat("h:mm a")} - {endTime.toFormat("h:mm a")} (
                   {slot.timezone})
@@ -161,9 +160,7 @@ export function BookingForm({
       </div>
 
       {apiError && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
-          {apiError}
-        </div>
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{apiError}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -229,14 +226,14 @@ export function BookingForm({
           <button
             type="button"
             onClick={handleBack}
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
             disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Booking..." : "Confirm Booking"}

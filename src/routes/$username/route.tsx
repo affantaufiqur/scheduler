@@ -80,29 +80,46 @@ function RouteComponent() {
   // If there's an error, display it
   if (data.error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-          <h1 className="mb-4 text-2xl font-bold text-gray-800">Error</h1>
-          <p className="text-gray-600">{data.error}</p>
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <div className="w-full max-w-md space-y-4 text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Oops!</h1>
+          <p className="text-slate-600">{data.error}</p>
         </div>
       </div>
     );
   }
 
+  // Header component
+  const BookingHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
+    <div className="mb-8 space-y-4">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
+        <p className="text-slate-600">{subtitle}</p>
+      </div>
+
+      {/* Meta information */}
+      <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:items-center">
+        <span>
+          <span className="font-semibold text-slate-900">Organizer:</span>{" "}
+          {data.settings?.workingTimezone}
+        </span>
+        <span className="hidden text-slate-300 sm:inline">•</span>
+        <span>
+          <span className="font-semibold text-slate-900">Your timezone:</span> {attendeeTimezone}
+        </span>
+      </div>
+    </div>
+  );
+
   // If booking was successful, show confirmation
   if (bookingResult && search.success === "true") {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-            <h1 className="text-3xl font-bold text-gray-800">{data.username}'s Booking</h1>
-            <p className="mt-2 text-gray-600">Your meeting has been confirmed</p>
-            <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-              <span>Organizer: {data.settings?.workingTimezone}</span>
-              <span>•</span>
-              <span>Your timezone: {attendeeTimezone}</span>
-            </div>
-          </div>
+      <div className="min-h-screen bg-white py-8">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <BookingHeader
+            title={`${data.username}'s Booking`}
+            subtitle="Your meeting has been confirmed"
+          />
 
           <BookingConfirmation
             booking={bookingResult}
@@ -118,17 +135,12 @@ function RouteComponent() {
   // If a slot is selected, show the booking form
   if (selectedSlot && !search.success) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-            <h1 className="text-3xl font-bold text-gray-800">{data.username}'s Booking</h1>
-            <p className="mt-2 text-gray-600">Complete your booking details</p>
-            <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-              <span>Organizer: {data.settings?.workingTimezone}</span>
-              <span>•</span>
-              <span>Your timezone: {attendeeTimezone}</span>
-            </div>
-          </div>
+      <div className="min-h-screen bg-white py-8">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <BookingHeader
+            title={`${data.username}'s Booking`}
+            subtitle="Complete your booking details"
+          />
 
           <BookingForm
             username={data.username}
@@ -144,21 +156,12 @@ function RouteComponent() {
 
   // Default view: show availability slots
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold text-gray-800">
-              {data.username}'s Availability - {data.settings?.defaultMeetingDuration} Min
-            </h1>
-            <p className="mt-2 text-gray-600">Select a time slot to book a meeting</p>
-            <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-              <span>Organizer: {data.settings?.workingTimezone}</span>
-              <span>•</span>
-              <span>Your timezone: {attendeeTimezone}</span>
-            </div>
-          </div>
-        </div>
+        <BookingHeader
+          title={`${data.username}'s Availability`}
+          subtitle={`Select a time slot to book a ${data.settings?.defaultMeetingDuration}-minute meeting`}
+        />
 
         <AvailabilitySlots
           slots={data.slots}

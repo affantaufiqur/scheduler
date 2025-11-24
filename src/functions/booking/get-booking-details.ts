@@ -9,6 +9,8 @@ type BookingDetailsResponse = {
   organizerId: string;
   attendantName: string;
   attendantEmail: string;
+  attendantTimezone: string;
+  status: string;
   title: string;
   description: string | null;
   startTime: string;
@@ -44,6 +46,8 @@ export const getBookingDetails = createServerFn({ method: "GET" })
       organizerId: booking.organizerId,
       attendantName: booking.attendantName,
       attendantEmail: booking.attendantEmail,
+      attendantTimezone: booking.attendantTimezone,
+      status: booking.status,
       title: booking.title,
       description: booking.description,
       startTime: booking.startTime.toISOString(),

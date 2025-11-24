@@ -43,6 +43,13 @@
       "when": 1763950109873,
       "tag": "0005_lucky_anita_blake",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1763953255025,
+      "tag": "0006_same_jubilee",
+      "breakpoints": true
     }
   ]
 }

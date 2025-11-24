@@ -14,6 +14,8 @@ export const workingHoursTable = pgTable(
     dayOfWeek: text("day_of_week").notNull(), // 0-6 where 0 = Sunday, 1 = Monday, etc.
     startTime: time("start_time").notNull(), // HH:mm format
     endTime: time("end_time").notNull(), // HH:mm format
+    startTimeUtc: timestamp("start_time_utc", { withTimezone: true }).notNull(),
+    endTimeUtc: timestamp("end_time_utc", { withTimezone: true }).notNull(),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })

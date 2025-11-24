@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/middleware/auth";
 import {
-  getWorkingHoursByUserId,
+  getWorkingHoursByUserIdWithTimezone,
   createWorkingHours,
   updateWorkingHours,
   deleteWorkingHours,
@@ -21,7 +21,7 @@ export const getWorkingHours = createServerFn({ method: "GET" })
     const userId = context.user.id;
 
     try {
-      const workingHours = await getWorkingHoursByUserId(userId);
+      const workingHours = await getWorkingHoursByUserIdWithTimezone(userId);
       return workingHours;
     } catch (error) {
       throw new Error("Failed to fetch working hours");

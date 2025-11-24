@@ -26,11 +26,14 @@ export function AvailabilitySlots({
 }: AvailabilitySlotsProps) {
   // Group slots by date for better organization
   const slotsByDate = slots.reduce((acc: Record<string, Slot[]>, slot) => {
-    const date = DateTime.fromISO(slot.startTime).toFormat("yyyy-MM-dd");
-    if (!acc[date]) {
-      acc[date] = [];
+    // Parse as UTC first, then convert to attendee timezone to get the correct date
+    const dateInAttendeeTimezone = DateTime.fromISO(slot.startTime, { zone: "utc" })
+      .setZone(attendeeTimezone)
+      .toFormat("yyyy-MM-dd");
+    if (!acc[dateInAttendeeTimezone]) {
+      acc[dateInAttendeeTimezone] = [];
     }
-    acc[date].push(slot);
+    acc[dateInAttendeeTimezone].push(slot);
     return acc;
   }, {});
 
@@ -39,7 +42,7 @@ export function AvailabilitySlots({
 
   if (slots.length === 0) {
     return (
-      <div className="flex items-center justify-center rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-6 py-16">
+      <div className="flex items-center justify-center rounded-xl border border-gray-200 from-gray-50 to-gray-100 px-6 py-16">
         <div className="text-center">
           <div className="mb-3 flex justify-center">
             <svg
@@ -68,10 +71,8 @@ export function AvailabilitySlots({
   return (
     <div className="space-y-8">
       {sortedDates.map((date) => {
-        // Convert organizer date to attendee's local date
-        const organizerDate = DateTime.fromISO(date);
-        const attendeeDate = organizerDate.setZone(attendeeTimezone);
-        const isDateMismatch = attendeeDate.toFormat("yyyy-MM-dd") !== date;
+        // Date is already in attendee's timezone from grouping
+        const attendeeDate = DateTime.fromISO(date);
 
         return (
           <div key={date} className="space-y-4">
@@ -82,24 +83,23 @@ export function AvailabilitySlots({
                   {attendeeDate.toFormat("EEEE")}
                 </h2>
                 <p className="text-sm text-gray-600">{attendeeDate.toFormat("MMMM d, yyyy")}</p>
-                {isDateMismatch && (
-                  <p className="text-xs text-gray-500">
-                    Organizer timezone: {organizerDate.toFormat("MMMM d, yyyy")}
-                  </p>
-                )}
               </div>
             </div>
 
             {/* Time Slots Grid */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {slotsByDate[date].map((slot, index) => {
+                // Parse UTC timestamps first (they are already in UTC from the server)
+                const startTimeUTC = DateTime.fromISO(slot.startTime, { zone: "utc" });
+                const endTimeUTC = DateTime.fromISO(slot.endTime, { zone: "utc" });
+
                 // Convert to organizer timezone for display
-                const startTime = DateTime.fromISO(slot.startTime, { zone: slot.timezone });
-                const endTime = DateTime.fromISO(slot.endTime, { zone: slot.timezone });
+                const startTime = startTimeUTC.setZone(slot.timezone);
+                const endTime = endTimeUTC.setZone(slot.timezone);
 
                 // Convert to attendee timezone
-                const attendeeStartTime = startTime.setZone(attendeeTimezone);
-                const attendeeEndTime = endTime.setZone(attendeeTimezone);
+                const attendeeStartTime = startTimeUTC.setZone(attendeeTimezone);
+                const attendeeEndTime = endTimeUTC.setZone(attendeeTimezone);
 
                 // Check if this slot is selected
                 const isSelected =

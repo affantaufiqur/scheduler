@@ -130,11 +130,18 @@ export function generateCandidateSlotsUTC(
 
     // Generate slots for each working hour block
     for (const wh of dayWorkingHours) {
-      // Parse start/end times (stored as "HH:mm" strings)
-      const [startHour, startMin] = wh.startTime.split(":").map(Number);
-      const [endHour, endMin] = wh.endTime.split(":").map(Number);
+      // Convert UTC timestamps to organizer's timezone to extract the correct time components
+      const startTimeInTZ = DateTime.fromJSDate(wh.startTimeUtc).setZone(timezone);
+      const endTimeInTZ = DateTime.fromJSDate(wh.endTimeUtc).setZone(timezone);
 
-      // Create working hour boundaries in organizer's timezone
+      // Extract time components from the organizer's timezone
+      // Get the time components (hours/minutes) from the UTC timestamps
+      const startHour = startTimeInTZ.hour;
+      const startMin = startTimeInTZ.minute;
+      const endHour = endTimeInTZ.hour;
+      const endMin = endTimeInTZ.minute;
+
+      // Create working hour boundaries in organizer's timezone for the current day
       const workStartInTZ = currentDayInTZ.set({
         hour: startHour,
         minute: startMin,
@@ -183,17 +190,15 @@ export function filterSlotsByBlackoutDates(
   timezone: string,
 ): CandidateSlot[] {
   return candidateSlots.filter((slot) => {
-    // Convert slot to organizer's timezone to check day
+    // Convert slot to organizer's timezone to determine which calendar day it falls on
     const slotInTZ = slot.startTimeUTC.setZone(timezone);
-    const slotDay = slotInTZ.startOf("day");
+    const slotDay = slotInTZ.startOf("day"); // 2025-11-24 00:00 Tokyo
 
     // Check if slot falls on any blackout date
     return !blackoutDates.some((blackout) => {
-      // Convert blackout date (UTC) to organizer's timezone
       const blackoutInTZ = DateTime.fromJSDate(blackout.date).setZone(timezone);
-      const blackoutDay = blackoutInTZ.startOf("day");
+      const blackoutDay = blackoutInTZ.startOf("day"); // 2025-11-24 00:00 Tokyo
 
-      // Compare day boundaries
       return slotDay.equals(blackoutDay);
     });
   });
@@ -252,15 +257,20 @@ export function applyBusinessRulesToSlots(
   const nowUTC = DateTime.now().toUTC();
   const minNoticeUTC = nowUTC.plus({ hours: settings.minBookingNotice });
 
-  return availableSlots.filter((slot) => {
+  const result = availableSlots.filter((slot) => {
     // Filter slots entirely in the past
-    if (slot.endTimeUTC <= nowUTC) return false;
+    if (slot.endTimeUTC <= nowUTC) {
+      return false;
+    }
 
     // Filter slots that don't meet minimum notice requirement
-    if (slot.startTimeUTC < minNoticeUTC) return false;
+    if (slot.startTimeUTC < minNoticeUTC) {
+      return false;
+    }
 
     // Note: max advance booking is already handled by window generation
-
     return true;
   });
+
+  return result;
 }

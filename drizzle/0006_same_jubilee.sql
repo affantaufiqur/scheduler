@@ -1,0 +1,2 @@
+ALTER TABLE "working_hours" ADD COLUMN "start_time_utc" timestamp with time zone NOT NULL;--> statement-breakpoint
+ALTER TABLE "working_hours" ADD COLUMN "end_time_utc" timestamp with time zone NOT NULL;

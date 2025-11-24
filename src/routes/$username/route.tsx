@@ -15,6 +15,7 @@ export const Route = createFileRoute("/$username")({
       const slots = await getAvailableSlotsByUsername({
         data: { username },
       });
+      // console.log("slots", slots);
       return {
         username,
         settings: slots.settings,

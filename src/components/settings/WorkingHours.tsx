@@ -5,14 +5,23 @@ import {
   bulkUpdateWorkingHoursFn,
   deleteWorkingHoursFn,
 } from "@/functions/organizer-settings";
+import { getOrganizerSettings } from "@/functions/organizer-settings";
 import { toast } from "sonner";
 
 interface WorkingHoursBackend {
   id: string;
+  userId: string;
   dayOfWeek: string;
-  startTime: string;
-  endTime: string;
+  startTime: string; // Time format from DB (HH:mm)
+  endTime: string; // Time format from DB (HH:mm)
+  startTimeUtc: Date; // UTC timestamp
+  endTimeUtc: Date; // UTC timestamp
+  startTimeLocal: string; // Local time for display (HH:mm)
+  endTimeLocal: string; // Local time for display (HH:mm)
   isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 const DAY_TO_NUMBER: Record<string, string> = {
@@ -40,6 +49,12 @@ export function WorkingHours() {
     queryFn: () => getWorkingHours(),
   });
 
+  // Fetch organizer settings to get timezone
+  const { data: organizerSettings } = useQuery({
+    queryKey: ["organizer-settings"],
+    queryFn: () => getOrganizerSettings(),
+  });
+
   // Track edits directly - this is what we'll submit
   const [editedHours, setEditedHours] = useState<WorkingHoursBackend[]>([]);
   const [validationError, setValidationError] = useState<string>("");
@@ -52,7 +67,7 @@ export function WorkingHours() {
   const getSlotsByDay = (dayNumber: string): WorkingHoursBackend[] => {
     return displayData
       .filter((wh) => wh.dayOfWeek === dayNumber && wh.isActive)
-      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      .sort((a, b) => a.startTimeLocal.localeCompare(b.startTimeLocal));
   };
 
   // Check if day is enabled
@@ -89,10 +104,18 @@ export function WorkingHours() {
             ...prev,
             {
               id: `new-${Date.now()}`,
+              userId: "",
               dayOfWeek: dayNumber,
-              startTime: "09:00",
-              endTime: "17:00",
+              startTime: "",
+              endTime: "",
+              startTimeUtc: new Date(), // Placeholder
+              endTimeUtc: new Date(), // Placeholder
+              startTimeLocal: "09:00", // Default to 9 AM
+              endTimeLocal: "17:00", // Default to 5 PM
               isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              deletedAt: null,
             },
           ];
         }
@@ -108,10 +131,18 @@ export function WorkingHours() {
       ...prev,
       {
         id: `new-${Date.now()}`,
+        userId: "",
         dayOfWeek: dayNumber,
-        startTime: "09:00",
-        endTime: "17:00",
+        startTime: "",
+        endTime: "",
+        startTimeUtc: new Date(),
+        endTimeUtc: new Date(),
+        startTimeLocal: "09:00", // Default to 9 AM
+        endTimeLocal: "17:00", // Default to 5 PM
         isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
       },
     ]);
   };
@@ -156,7 +187,11 @@ export function WorkingHours() {
   });
 
   // Update time for a slot
-  const updateSlotTime = (id: string, field: "startTime" | "endTime", value: string): void => {
+  const updateSlotTime = (
+    id: string,
+    field: "startTimeLocal" | "endTimeLocal",
+    value: string,
+  ): void => {
     ensureEditsInitialized();
     setEditedHours((prev) => prev.map((wh) => (wh.id === id ? { ...wh, [field]: value } : wh)));
   };
@@ -171,10 +206,10 @@ export function WorkingHours() {
 
   // Check if two time slots overlap
   const slotsOverlap = (slot1: WorkingHoursBackend, slot2: WorkingHoursBackend): boolean => {
-    const start1 = slot1.startTime.split(":").map(Number);
-    const end1 = slot1.endTime.split(":").map(Number);
-    const start2 = slot2.startTime.split(":").map(Number);
-    const end2 = slot2.endTime.split(":").map(Number);
+    const start1 = slot1.startTimeLocal.split(":").map(Number);
+    const end1 = slot1.endTimeLocal.split(":").map(Number);
+    const start2 = slot2.startTimeLocal.split(":").map(Number);
+    const end2 = slot2.endTimeLocal.split(":").map(Number);
 
     const start1Minutes = start1[0] * 60 + start1[1];
     const end1Minutes = end1[0] * 60 + end1[1];
@@ -188,7 +223,7 @@ export function WorkingHours() {
   const validateNoOverlaps = (): { valid: boolean; errorDay?: string } => {
     for (const dayNum of Object.keys(DAY_TO_NUMBER)) {
       const dayNumber = DAY_TO_NUMBER[dayNum];
-      const slots = displayData.filter((wh) => wh.dayOfWeek === dayNumber);
+      const slots = displayData.filter((wh) => wh.dayOfWeek === dayNumber && wh.isActive);
 
       for (let i = 0; i < slots.length; i++) {
         for (let j = i + 1; j < slots.length; j++) {
@@ -212,8 +247,8 @@ export function WorkingHours() {
     return editedHours.map((wh) => ({
       ...(wh.id.startsWith("new-") ? {} : { id: wh.id }),
       dayOfWeek: wh.dayOfWeek,
-      startTime: formatTimeHHmm(wh.startTime),
-      endTime: formatTimeHHmm(wh.endTime),
+      startTime: formatTimeHHmm(wh.startTimeLocal), // Use local time for submission
+      endTime: formatTimeHHmm(wh.endTimeLocal), // Use local time for submission
       isActive: wh.isActive,
     }));
   };
@@ -267,7 +302,10 @@ export function WorkingHours() {
     <div className="max-w-4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Working Hours</h1>
-        <p className="mt-1 text-gray-600">Set your weekly availability schedule.</p>
+        <p className="mt-1 text-gray-600">
+          Set your weekly availability schedule. All times shown in{" "}
+          {organizerSettings?.workingTimezone || "UTC"}.
+        </p>
       </div>
 
       {isLoading && (
@@ -350,8 +388,10 @@ export function WorkingHours() {
                         <label className="text-sm text-gray-600">From:</label>
                         <input
                           type="time"
-                          value={slot.startTime}
-                          onChange={(e) => updateSlotTime(slot.id, "startTime", e.target.value)}
+                          value={slot.startTimeLocal}
+                          onChange={(e) =>
+                            updateSlotTime(slot.id, "startTimeLocal", e.target.value)
+                          }
                           disabled={isSaving}
                           className="rounded-md border border-gray-300 px-2 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                         />
@@ -361,8 +401,8 @@ export function WorkingHours() {
                         <label className="text-sm text-gray-600">To:</label>
                         <input
                           type="time"
-                          value={slot.endTime}
-                          onChange={(e) => updateSlotTime(slot.id, "endTime", e.target.value)}
+                          value={slot.endTimeLocal}
+                          onChange={(e) => updateSlotTime(slot.id, "endTimeLocal", e.target.value)}
                           disabled={isSaving}
                           className="rounded-md border border-gray-300 px-2 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                         />

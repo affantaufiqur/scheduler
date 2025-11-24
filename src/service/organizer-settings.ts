@@ -1,7 +1,11 @@
 import db from "@/configs/db";
 import { organizerSettingsTable } from "@/configs/db/schema/organizer-settings";
-import { eq } from "drizzle-orm";
+import { workingHoursTable } from "@/configs/db/schema/working-hours";
+import { eq, and, isNull } from "drizzle-orm";
 import { OrganizerSettings, NewOrganizerSettings } from "@/configs/db/schema/organizer-settings";
+import { WorkingHours } from "@/configs/db/schema/working-hours";
+import { convertTimeStringToUTCTimestamp, convertUTCTimestampToTimeString } from "@/helpers/timezone";
+import { DateTime } from "luxon";
 
 export async function createOrganizerSettings(
   userId: string,
@@ -43,6 +47,15 @@ export async function updateOrganizerSettings(
   // Remove userId from settings if present to prevent updating it
   const { userId: _, ...updateData } = settings;
 
+  // Check if timezone is being updated
+  const isTimezoneUpdated = settings.workingTimezone;
+
+  // Get current settings before update
+  const currentSettings = await getOrganizerSettings(userId);
+  if (!currentSettings) {
+    throw new Error("Organizer settings not found");
+  }
+
   const result = await db
     .update(organizerSettingsTable)
     .set({
@@ -52,7 +65,51 @@ export async function updateOrganizerSettings(
     .where(eq(organizerSettingsTable.userId, userId))
     .returning();
 
-  return result[0] || null;
+  const updatedSettings = result[0] || null;
+
+  // If timezone was updated, convert all working hours to the new timezone
+  if (isTimezoneUpdated && updatedSettings) {
+    await convertWorkingHoursToNewTimezone(userId, currentSettings.workingTimezone, settings.workingTimezone!);
+  }
+
+  return updatedSettings;
+}
+
+/**
+ * Convert all working hours from one timezone to another
+ * This maintains the same local time representation but updates the underlying UTC storage
+ */
+async function convertWorkingHoursToNewTimezone(
+  userId: string,
+  oldTimezone: string,
+  newTimezone: string,
+): Promise<void> {
+  // Get all working hours for the user
+  const workingHours = await db
+    .select()
+    .from(workingHoursTable)
+    .where(and(eq(workingHoursTable.userId, userId), isNull(workingHoursTable.deletedAt)));
+
+  // Convert each working hour to the new timezone
+  for (const wh of workingHours) {
+    // Convert current UTC timestamp to local time in old timezone
+    const currentStartTimeLocal = convertUTCTimestampToTimeString(wh.startTimeUtc, oldTimezone);
+    const currentEndTimeLocal = convertUTCTimestampToTimeString(wh.endTimeUtc, oldTimezone);
+
+    // Convert the same local times to UTC timestamps in the new timezone
+    const newStartTimeUTC = convertTimeStringToUTCTimestamp(currentStartTimeLocal, newTimezone);
+    const newEndTimeUTC = convertTimeStringToUTCTimestamp(currentEndTimeLocal, newTimezone);
+
+    // Update the database record with new UTC timestamps
+    await db
+      .update(workingHoursTable)
+      .set({
+        startTimeUtc: newStartTimeUTC,
+        endTimeUtc: newEndTimeUTC,
+        updatedAt: new Date(),
+      })
+      .where(eq(workingHoursTable.id, wh.id));
+  }
 }
 
 export async function deleteOrganizerSettings(userId: string): Promise<boolean> {

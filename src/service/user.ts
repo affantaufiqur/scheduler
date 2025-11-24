@@ -6,6 +6,7 @@ import { workingHoursTable } from "@/configs/db/schema/working-hours";
 import { eq } from "drizzle-orm";
 import * as argon2 from "argon2";
 import createSessionToken from "@/helpers/session-token";
+import { convertTimeStringToUTCTimestamp } from "@/helpers/timezone";
 
 import { registerSchema } from "@/functions/auth/register";
 import { loginSchema } from "@/functions/auth/login";
@@ -82,8 +83,15 @@ export async function createUser(user: z.infer<typeof registerSchema>) {
         { dayOfWeek: "5", startTime: "09:00", endTime: "17:00", isActive: true }, // Friday
       ];
 
+      // Convert time strings to UTC timestamps using the user's timezone (UTC by default)
+      const workingHoursWithTimestamps = defaultWorkingHours.map((hours) => ({
+        ...hours,
+        startTimeUtc: convertTimeStringToUTCTimestamp(hours.startTime, "UTC"),
+        endTimeUtc: convertTimeStringToUTCTimestamp(hours.endTime, "UTC"),
+      }));
+
       const workingHoursResults = await Promise.all(
-        defaultWorkingHours.map((hours) =>
+        workingHoursWithTimestamps.map((hours) =>
           tx
             .insert(workingHoursTable)
             .values({
@@ -91,6 +99,8 @@ export async function createUser(user: z.infer<typeof registerSchema>) {
               dayOfWeek: hours.dayOfWeek,
               startTime: hours.startTime,
               endTime: hours.endTime,
+              startTimeUtc: hours.startTimeUtc, // Add UTC timestamp
+              endTimeUtc: hours.endTimeUtc, // Add UTC timestamp
               isActive: hours.isActive,
             })
             .returning({ id: workingHoursTable.id }),

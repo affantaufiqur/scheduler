@@ -138,7 +138,7 @@ Almost most of the codebase was generated using AI, to make the LLM not stereed 
 - RPC style API, no REST endpoint.
 - No seeder.
 - Mobile UI is not optimized or checked.
-- Deployment or CI/CD is not setup.
+- ~~Deployment or CI/CD is not setup.~~
 
 - No integration with calendar services like Google Calendar or Outlook.
 - No email notifications for bookings yet.
@@ -149,5 +149,5 @@ Almost most of the codebase was generated using AI, to make the LLM not stereed 
 - Improve the UI/UX.
 - Add email notifications for booking confirmations and reminders.
 - Integrate with calendar services like Google Calendar and Outlook.
-- Deploymend and CI/CD setup.
+- ~~Deployment and CI/CD setup.~~
 - Possibly make the service query able via REST.

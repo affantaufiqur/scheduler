@@ -79,6 +79,7 @@ export async function deleteBooking(id: string): Promise<boolean> {
   const result = await db
     .update(bookingsTable)
     .set({
+      status: "cancelled",
       deletedAt: new Date(),
       updatedAt: new Date(),
     })

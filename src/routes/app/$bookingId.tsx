@@ -156,6 +156,11 @@ function RouteComponent() {
                 </div>
 
                 <div>
+                  <h3 className="text-sm font-medium text-gray-700">Time Zone</h3>
+                  <p className="mt-1 text-sm text-gray-900">{booking.attendantTimezone}</p>
+                </div>
+
+                <div>
                   <h3 className="text-sm font-medium text-gray-700">Email</h3>
                   <div className="mt-1 flex items-center text-sm text-gray-900">
                     <Mail className="mr-2 h-4 w-4 text-gray-400" />

@@ -15,11 +15,32 @@ The working hours are stored in the `working_hours` table with the following str
   dayOfWeek: string,             // Day number (0-6, where 0 = Sunday)
   startTime: string,             // Start time in HH:mm format (24-hour)
   endTime: string,               // End time in HH:mm format (24-hour)
+  startTimeUtc: Date,             // Start time as UTC timestamp (with timezone)
+  endTimeUtc: Date,               // End time as UTC timestamp (with timezone)
   isActive: boolean,             // Whether this time slot is active
   createdAt: Date,               // Creation timestamp (UTC)
   updatedAt: Date,               // Last update timestamp (UTC)
   deletedAt: Date?,              // Soft delete timestamp (optional)
 }
+```
+
+### Timezone Handling
+
+The working hours table uses a dual approach for time storage to ensure consistent timezone handling:
+
+- **Time String Fields** (`startTime`, `endTime`): Store the time in HH:mm format for UI display and user input
+- **UTC Timestamp Fields** (`startTimeUtc`, `endTimeUtc`): Store the exact time as UTC timestamps for calculations and comparisons
+
+### Timezone Conversion
+
+The system uses helper functions to convert between time strings and UTC timestamps:
+
+```typescript
+// Convert time string in user's timezone to UTC timestamp
+convertTimeStringToUTCTimestamp("09:00", "America/New_York") // Returns Date object
+
+// Convert UTC timestamp back to time string in user's timezone
+convertUTCTimestampToTimeString(utcDate, "America/New_York") // Returns "09:00"
 ```
 
 ### Day of Week Mapping
@@ -38,14 +59,30 @@ The service layer provides the following functions for managing working hours:
 
 ### `createWorkingHours(userId, workingHours)`
 
-Creates a new working hours entry for a user.
+Creates a new working hours entry for a user. The function automatically converts time strings to UTC timestamps based on the user's timezone settings.
 
 **Parameters:**
 
 - `userId: string` - The user ID to create working hours for
-- `workingHours: Omit<NewWorkingHours, "id" | "userId" | "createdAt" | "updatedAt">` - Working hours data
+- `workingHours: Omit<NewWorkingHours, "id" | "userId" | "createdAt" | "updatedAt" | "startTimeUtc" | "endTimeUtc">` - Working hours data with time strings in HH:mm format
 
-**Returns:** `WorkingHours | null` - The created working hours or null if failed
+**Returns:** `WorkingHours | null` - The created working hours with UTC timestamps calculated or null if failed
+
+**Example:**
+
+```typescript
+const result = await createWorkingHours(userId, {
+  dayOfWeek: "1",
+  startTime: "09:00",
+  endTime: "17:00",
+  isActive: true
+});
+// Returns working hours with:
+// - startTime: "09:00"
+// - endTime: "17:00" 
+// - startTimeUtc: UTC timestamp for 9 AM in user's timezone
+// - endTimeUtc: UTC timestamp for 5 PM in user's timezone
+```
 
 ### `getWorkingHoursByUserId(userId)`
 
@@ -55,7 +92,17 @@ Retrieves all working hours for a user, ordered by day of week.
 
 - `userId: string` - The user ID to get working hours for
 
-**Returns:** `WorkingHours[]` - Array of working hours entries
+**Returns:** `WorkingHours[]` - Array of working hours entries with both time strings and UTC timestamps
+
+### `getWorkingHoursByUserIdWithTimezone(userId)`
+
+Retrieves working hours for a user with time components converted to user's timezone.
+
+**Parameters:**
+
+- `userId: string` - The user ID to get working hours for
+
+**Returns:** `Array<WorkingHours & { startTimeLocal: string; endTimeLocal: string }>` - Array of working hours entries with additional local time fields
 
 ### `getWorkingHoursByDay(userId, dayOfWeek)`
 
@@ -70,12 +117,12 @@ Retrieves working hours for a specific day of the week.
 
 ### `updateWorkingHours(id, workingHours)`
 
-Updates existing working hours.
+Updates existing working hours. When updating time values, the system automatically converts time strings to UTC timestamps using the user's timezone.
 
 **Parameters:**
 
 - `id: string` - The working hours entry ID to update
-- `workingHours: Partial<NewWorkingHours>` - The data to update
+- `workingHours: Partial<NewWorkingHours>` - The data to update (can include startTimeUtc and endTimeUtc for direct UTC timestamp updates)
 
 **Returns:** `WorkingHours | null` - The updated working hours or null if failed
 
@@ -91,14 +138,14 @@ Soft deletes working hours (marks as deleted but keeps record).
 
 ### `bulkUpdateWorkingHours(userId, workingHoursArray)`
 
-Updates multiple working hours entries in a single operation.
+Updates multiple working hours entries in a single operation. Time strings are automatically converted to UTC timestamps based on the user's timezone settings.
 
 **Parameters:**
 
 - `userId: string` - The user ID
-- `workingHoursArray: Array<Partial<WorkingHours>>` - Array of working hours to update/create
+- `workingHoursArray: Array<Partial<WorkingHours>>` - Array of working hours to update/create with time strings that will be converted to UTC
 
-**Returns:** `WorkingHours[]` - Array of updated/created working hours
+**Returns:** `WorkingHours[]` - Array of updated/created working hours with UTC timestamps calculated
 
 ### `setDefaultWorkingHours(userId)`
 
@@ -438,6 +485,13 @@ const defaultWorkingHours = [
   { dayOfWeek: "4", startTime: "09:00", endTime: "17:00", isActive: true }, // Thursday
   { dayOfWeek: "5", startTime: "09:00", endTime: "17:00", isActive: true }, // Friday
 ];
+
+// Convert time strings to UTC timestamps using the user's timezone (UTC by default)
+const workingHoursWithTimestamps = defaultWorkingHours.map((hours) => ({
+  ...hours,
+  startTimeUtc: convertTimeStringToUTCTimestamp(hours.startTime, "UTC"),
+  endTimeUtc: convertTimeStringToUTCTimestamp(hours.endTime, "UTC"),
+}));
 ```
 
 ### Transaction Safety
@@ -454,3 +508,30 @@ The working hours creation is part of the same database transaction as user crea
 - **Data Consistency**: All users will have working hours, preventing null/missing data issues
 - **Atomic Operations**: All user data (user, settings, working hours) is created in a single transaction
 - **Consistency**: Follows the same pattern as existing organizer settings creation
+- **Timezone Safety**: UTC timestamps ensure consistent time calculations regardless of user timezone changes
+
+## Timezone Best Practices
+
+When working with the working hours system, follow these guidelines for proper timezone handling:
+
+### For Database Operations
+
+- Use the UTC timestamp fields (`startTimeUtc`, `endTimeUtc`) for all calculations, comparisons, and time-based queries
+- Time strings (`startTime`, `endTime`) should only be used for display purposes and user input
+
+### For UI Components
+
+- Use `getWorkingHoursByUserIdWithTimezone()` to get times converted to the user's local timezone for display
+- When users submit times, they should be in HH:mm format and will be automatically converted to UTC
+
+### For Calculations
+
+The availability engine uses UTC timestamps for all time calculations:
+
+```typescript
+// From availability.ts - how UTC timestamps are used for accurate calculations
+const startTimeInTZ = DateTime.fromJSDate(wh.startTimeUtc).setZone(timezone);
+const endTimeInTZ = DateTime.fromJSDate(wh.endTimeUtc).setZone(timezone);
+```
+
+This ensures that time calculations are consistent regardless of the user's timezone settings.

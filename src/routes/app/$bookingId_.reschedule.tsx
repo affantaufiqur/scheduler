@@ -86,8 +86,8 @@ function RouteComponent() {
     rescheduleMutation.mutate(selectedSlot);
   };
 
-  // Detect user's timezone
-  const attendeeTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Use attendant's timezone from booking
+  const attendeeTimezone = booking.attendantTimezone;
 
   // Current booking times in attendee timezone
   const currentStart = DateTime.fromISO(booking.startTime).setZone(

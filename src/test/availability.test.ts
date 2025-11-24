@@ -372,6 +372,8 @@ describe("Availability", () => {
           metadata: null,
           title: "Test Meeting",
           description: null,
+          status: "scheduled",
+          attendantTimezone: "UTC",
           startTime: createDateAtTime(2025, 11, 24, 10, 0),
           endTime: createDateAtTime(2025, 11, 24, 11, 0),
           createdAt: new Date(),

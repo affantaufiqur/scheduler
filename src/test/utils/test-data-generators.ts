@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { OrganizerSettings, WorkingHours, BlackoutDates, Booking } from "@/configs/db/schema";
+import { convertTimeStringToUTCTimestamp } from "@/helpers/timezone";
 
 // Generate test organizer settings
 export function generateOrganizerSettings(
@@ -25,6 +26,7 @@ export function generateOrganizerSettings(
 export function generateStandardWorkingHours(
   overrides: Partial<WorkingHours> = {},
 ): WorkingHours[] {
+  const timezone = "UTC"; // Default timezone for tests
   const baseHours: WorkingHours[] = [
     // Monday (1) to Friday (5)
     {
@@ -33,6 +35,8 @@ export function generateStandardWorkingHours(
       dayOfWeek: "1",
       startTime: "09:00",
       endTime: "17:00",
+      startTimeUtc: convertTimeStringToUTCTimestamp("09:00", timezone),
+      endTimeUtc: convertTimeStringToUTCTimestamp("17:00", timezone),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -44,6 +48,8 @@ export function generateStandardWorkingHours(
       dayOfWeek: "2",
       startTime: "09:00",
       endTime: "17:00",
+      startTimeUtc: convertTimeStringToUTCTimestamp("09:00", timezone),
+      endTimeUtc: convertTimeStringToUTCTimestamp("17:00", timezone),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -55,6 +61,8 @@ export function generateStandardWorkingHours(
       dayOfWeek: "3",
       startTime: "09:00",
       endTime: "17:00",
+      startTimeUtc: convertTimeStringToUTCTimestamp("09:00", timezone),
+      endTimeUtc: convertTimeStringToUTCTimestamp("17:00", timezone),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -66,6 +74,8 @@ export function generateStandardWorkingHours(
       dayOfWeek: "4",
       startTime: "09:00",
       endTime: "17:00",
+      startTimeUtc: convertTimeStringToUTCTimestamp("09:00", timezone),
+      endTimeUtc: convertTimeStringToUTCTimestamp("17:00", timezone),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -77,6 +87,8 @@ export function generateStandardWorkingHours(
       dayOfWeek: "5",
       startTime: "09:00",
       endTime: "17:00",
+      startTimeUtc: convertTimeStringToUTCTimestamp("09:00", timezone),
+      endTimeUtc: convertTimeStringToUTCTimestamp("17:00", timezone),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -84,7 +96,7 @@ export function generateStandardWorkingHours(
     },
   ];
 
-  return baseHours.map((hour, index) => ({ ...hour, ...overrides }));
+  return baseHours.map((hour) => ({ ...hour, ...overrides }));
 }
 
 // Generate blackout dates
@@ -112,6 +124,8 @@ export function generateBookings(
     title?: string;
     attendantName?: string;
     attendantEmail?: string;
+    status?: string;
+    attendantTimezone?: string;
   }>,
   overrides: Partial<Booking> = {},
 ): Booking[] {
@@ -123,6 +137,8 @@ export function generateBookings(
     metadata: null,
     title: booking.title || "Test Meeting",
     description: null,
+    status: booking.status || "scheduled",
+    attendantTimezone: booking.attendantTimezone || "UTC",
     startTime: booking.startTime,
     endTime: booking.endTime,
     createdAt: new Date(),
@@ -166,6 +182,7 @@ export function generateWorkingHoursForDay(
   startTime: string,
   endTime: string,
   userId: string = "test-user-id",
+  timezone: string = "UTC",
 ): WorkingHours {
   return {
     id: `wh-${dayOfWeek}-${Date.now()}`,
@@ -173,6 +190,8 @@ export function generateWorkingHoursForDay(
     dayOfWeek,
     startTime,
     endTime,
+    startTimeUtc: convertTimeStringToUTCTimestamp(startTime, timezone),
+    endTimeUtc: convertTimeStringToUTCTimestamp(endTime, timezone),
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -185,6 +204,7 @@ export function generateMultipleWorkingHoursForDay(
   dayOfWeek: string,
   timeBlocks: Array<{ startTime: string; endTime: string }>,
   userId: string = "test-user-id",
+  timezone: string = "UTC",
 ): WorkingHours[] {
   return timeBlocks.map((block, index) => ({
     id: `wh-${dayOfWeek}-${index}-${Date.now()}`,
@@ -192,6 +212,8 @@ export function generateMultipleWorkingHoursForDay(
     dayOfWeek,
     startTime: block.startTime,
     endTime: block.endTime,
+    startTimeUtc: convertTimeStringToUTCTimestamp(block.startTime, timezone),
+    endTimeUtc: convertTimeStringToUTCTimestamp(block.endTime, timezone),
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),

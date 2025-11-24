@@ -11,6 +11,7 @@ export const createBookingSchema = z.object({
   organizerUsername: z.string().min(3, "Username must be at least 3 characters"),
   attendantName: z.string().min(1, "Attendant name is required"),
   attendantEmail: z.email("Invalid email address"),
+  attendantTimezone: z.string().optional(), // Timezone can be optional, defaulted to UTC
   title: z.string().min(1, "Meeting title is required"),
   description: z.string().optional(),
   startTime: z.iso.datetime(), // ISO datetime string
@@ -28,6 +29,7 @@ export const createBooking = createServerFn({ method: "POST" })
       organizerUsername,
       attendantName,
       attendantEmail,
+      attendantTimezone,
       title,
       description,
       startTime: startTimeStr,
@@ -96,6 +98,7 @@ export const createBooking = createServerFn({ method: "POST" })
         organizerId,
         attendantName,
         attendantEmail,
+        attendantTimezone: attendantTimezone || "UTC",
         title: title,
         description: description || null,
         startTime,
@@ -114,6 +117,7 @@ export const createBooking = createServerFn({ method: "POST" })
           organizerId: newBooking.organizerId,
           attendantName: newBooking.attendantName,
           attendantEmail: newBooking.attendantEmail,
+          attendantTimezone: newBooking.attendantTimezone,
           title: newBooking.title,
           description: newBooking.description,
           startTime: newBooking.startTime.toISOString(),

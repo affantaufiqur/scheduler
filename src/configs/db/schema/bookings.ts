@@ -16,6 +16,8 @@ export const bookingsTable = pgTable(
     metadata: jsonb("metadata"), // For additional attendees
     title: text("title").notNull(),
     description: text("description"),
+    status: text("status").notNull().default("scheduled"),
+    attendantTimezone: text("attendant_timezone").notNull().default("UTC"),
     startTime: timestamp("start_time", { withTimezone: true }).notNull(),
     endTime: timestamp("end_time", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -31,6 +33,7 @@ export const bookingsTable = pgTable(
       table.organizerId,
       table.startTime,
     ),
+    statusIndex: index("bookings_status_idx").on(table.status),
   }),
 );
 

@@ -147,6 +147,7 @@ export function BookingForm({
             organizerUsername: username,
             attendantName: formData.attendantName,
             attendantEmail: formData.attendantEmail,
+            attendantTimezone: attendeeTimezone,
             title: formData.title,
             description: formData.description,
             startTime: slot.startTime,

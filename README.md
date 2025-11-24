@@ -1,5 +1,11 @@
 # Meeting Scheduler
 
+## How to book
+Make sure that you've created a user, if you already has user registered, you can use the username of that account to make bookings
+
+example:
+https://localhost:3000/affan -> this will open the booking page for user with username "affan"
+
 ## Prerequisites
 
 - Node.js v20+
